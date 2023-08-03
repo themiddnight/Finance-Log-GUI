@@ -1,20 +1,21 @@
 import sqlite3
 from datetime import datetime
 
-connection = sqlite3.connect('/Users/Pathompong/Documents/Projects/Python/myfinance/my_finance.db')
+connection = sqlite3.connect('/Users/Pathompong/Documents/GitHub/finance_database/my_finance.db')
 cursor = connection.cursor()
 
 # prepare variable
 table  = datetime.now().strftime('%B')
 date   = datetime.now().strftime('%d/%m/%y')
-bank   = 3789
-wallet = 1680
+bank   = 3786
+wallet = 1675
 
 # check if it has the table
-cursor.execute("""--sql
-               SELECT ID from {};
-               """.format(table))
-if not cursor.fetchone():
+try:
+    cursor.execute("""--sql
+                SELECT ID from {};
+                """.format(table))
+except:
     cursor.execute("""--sql
                    CREATE TABLE {} 
                    (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -24,35 +25,28 @@ if not cursor.fetchone():
 	
 # read table - check latest id
 cursor.execute("""--sql
-               SELECT ID from {}
+               SELECT ID, bank, wallet FROM {}
                ORDER by ID DESC
                """.format(table))
-rows = cursor.fetchone()[0]
-if not rows: id = 0     # if empty, start with 0
-else: id = rows + 1     # if has data, increase id
+rows = cursor.fetchmany(2)
+if not rows: id = 0         # if empty, start with 0
+else: id = rows[0][0] + 1   # if has data, increase id
+
+# calculate difference
+if len(rows) == 2:          # if it has 2 rows that can find difference
+    bank_dif   = bank - rows[0][1]
+    wallet_dif = wallet - rows[0][2]
+    total_dif  = bank_dif + wallet_dif
+else:
+    bank_dif   = 0
+    wallet_dif = 0
+    total_dif  = 0
 
 # add item to table
 cursor.execute("""--sql
-               INSERT INTO {} (ID, date, bank, wallet)
-               VALUES ({}, '{}', {}, {});
-               """.format(table, id, date, bank, wallet))
-connection.commit()
-
-# update difference value to table
-cursor.execute("""--sql
-               SELECT bank, wallet FROM {}
-               ORDER by ID DESC
-               """.format(table))
-rows = cursor.fetchmany(2)  # get 2 latest row
-if len(rows) == 2:          # if it has 2 rows that can find difference
-    bank_dif   = rows[0][0] - rows[1][0]
-    wallet_dif = rows[0][1] - rows[1][1]
-    total_dif  = bank_dif + wallet_dif
-    cursor.execute("""--sql
-                   UPDATE {} 
-                   SET bank_dif = {}, wallet_dif = {}, total_dif = {}
-                   WHERE ID = {}
-                   """.format(table, bank_dif, wallet_dif, total_dif, id))
+               INSERT INTO {} (ID, date, bank, wallet, bank_dif, wallet_dif, total_dif)
+               VALUES ({}, '{}', {}, {}, {}, {}, {});
+               """.format(table, id, date, bank, wallet, bank_dif, wallet_dif, total_dif))
 connection.commit()
 
 # get sum of each differences
