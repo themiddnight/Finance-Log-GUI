@@ -1,13 +1,15 @@
 import sqlite3
+import json
 from datetime import datetime
 
 # prepare variable
-connection_path = '/Users/Pathompong/Library/Mobile Documents/com~apple~CloudDocs/Database/my_finance.db'
-table  = datetime.now().strftime('%B_%Y')
-date   = datetime.now().strftime('%d/%m/%y')
 income = 200
 bank   = 5786
 wallet = 1600
+table  = datetime.now().strftime('%B_%Y')
+date   = datetime.now().strftime('%d/%m/%y')
+with open('data/path.json', 'r') as f:
+    connection_path = json.load(f)['0']
 
 def insert_data(table, date, income, bank, wallet):
     connection = sqlite3.connect(connection_path)
