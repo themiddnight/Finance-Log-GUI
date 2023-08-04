@@ -3,12 +3,13 @@ from datetime import datetime
 
 # prepare variable
 connection_path = '/Users/Pathompong/Library/Mobile Documents/com~apple~CloudDocs/Database/my_finance.db'
-table  = datetime.now().strftime('%B')
+table  = datetime.now().strftime('%B_%Y')
 date   = datetime.now().strftime('%d/%m/%y')
-bank   = 3786
-wallet = 1675
+income = 200
+bank   = 5786
+wallet = 1600
 
-def insert_data(table, date, bank, wallet):
+def insert_data(table, date, income, bank, wallet):
     connection = sqlite3.connect(connection_path)
     cursor = connection.cursor()
 
@@ -21,52 +22,65 @@ def insert_data(table, date, bank, wallet):
         cursor.execute("""--sql
                     CREATE TABLE {} 
                     (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-                    date TEXT, bank NUMERIC, wallet NUMERIC, 
+                    date TEXT, income NUMERIC, bank NUMERIC, wallet NUMERIC, 
                     bank_dif NUMERIC, wallet_dif NUMERIC, total_dif NUMERIC);
                     """.format(table))
         
-    # read table - check latest id
+    # read 2 latest row
     cursor.execute("""--sql
                 SELECT ID, bank, wallet FROM {}
                 ORDER by ID DESC
                 """.format(table))
     rows = cursor.fetchmany(2)
+
+    # check latest id
     if not rows: id = 0         # if empty, start with 0
     else: id = rows[0][0] + 1   # if has data, increase id
 
     # calculate difference
-    if len(rows) == 2:          # if it has 2 rows that can find difference
-        bank_dif   = bank - rows[0][1]
+    if len(rows) >= 1:          # if it has a row prior to find difference
+        if not income:
+            bank_dif   = (bank - rows[0][1])
+        else:
+            bank_dif   = (bank - rows[0][1]) - income
         wallet_dif = wallet - rows[0][2]
         total_dif  = bank_dif + wallet_dif
     else:
-        bank_dif   = 0
-        wallet_dif = 0
-        total_dif  = 0
+        bank_dif   = None
+        wallet_dif = None
+        total_dif  = None
 
     # add item to table
     cursor.execute("""--sql
-                INSERT INTO {} (ID, date, bank, wallet, bank_dif, wallet_dif, total_dif)
-                VALUES ({}, '{}', {}, {}, {}, {}, {});
-                """.format(table, id, date, bank, wallet, bank_dif, wallet_dif, total_dif))
+                   INSERT INTO {} (ID, date, income, bank, wallet, bank_dif, wallet_dif, total_dif)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                   """.format(table), (id, date, income, bank, wallet, bank_dif, wallet_dif, total_dif))
     connection.commit()
+
+    cursor.close()
+    connection.close()
+
+def show_sum():
+    connection = sqlite3.connect(connection_path)
+    cursor = connection.cursor()
 
     # get sum of each differences
     cursor.execute("""--sql
-                SELECT SUM(bank_dif), SUM(wallet_dif), SUM(total_dif) FROM {}
-                """.format(table))
-    rows = cursor.fetchall()
+                   SELECT SUM(income), SUM(bank_dif), SUM(wallet_dif), SUM(total_dif) FROM {}
+                   """.format(table))
+    rows = cursor.fetchone()
+
+    print('=====================================')
+    print('Total income:          ', rows[0], 'THB')
+    print('-------------------------------------')
+    print('Total bank spending:   ', rows[1], 'THB')
+    print('Total wallet spending: ', rows[2], 'THB')
+    print('-------------------------------------')
+    print('Total spending:        ', rows[3], 'THB')
+    print('=====================================')
+
     cursor.close()
     connection.close()
-    return rows[0][0], rows[0][1], rows[0][2]
 
-def show_sum(total_bank, total_wallet, grand_total):
-    print('=====================================')
-    print('Total bank spending:   ', total_bank, 'THB')
-    print('Total wallet spending: ', total_wallet, 'THB')
-    print('-------------------------------------')
-    print('Total spending:        ', grand_total, 'THB')
-    print('=====================================')
-
-t_bank, t_wallet, g_total = insert_data(table, date, bank, wallet)
-show_sum(t_bank, t_wallet, g_total)
+insert_data(table, date, income, bank, wallet)
+show_sum()
