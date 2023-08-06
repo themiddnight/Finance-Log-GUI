@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Finance Logging</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='image/favicon.png') }}">
+    <link href="../static/style/style.css" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='style/style.css') }}" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <h1>FINANCE LOGGING</h1>
+    <form class="vertical-center" action="{{ url_for('addtable') }}" method="post">
+        <div class="logfield">
+            <label>Date*</label>
+            <label>Income</label>
+            <label>Bank remaining*</label>
+            <label>Wallet remaining*</label>
+            <input type="date" name="date" required>
+            <input type="number" name="income" min="0">
+            <input type="number" name="bank" min="0" required>
+            <input type="number" name="wallet" min="0" required>
+        </div>
+        <div class="lognote">
+            <label>Notes</label><br>
+            <input type="text" name="notes">
+        </div>
+        <div class="button">
+            <button class="button shadow">SUBMIT</button>
+        </div>
+        <p style="text-align: center; margin-top: 30px;"><a href="{{ url_for('table') }}">View the table</a></p>
+    </form>
+</body>

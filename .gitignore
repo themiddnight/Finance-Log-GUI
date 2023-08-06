@@ -1,1 +1,6 @@
+__pycache__
 data
+image
+playground.py
+.gitignore
+.DS_Store
