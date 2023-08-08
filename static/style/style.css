@@ -1,7 +1,7 @@
 html {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background: #f64f59;
-    background-image: linear-gradient(to top, #12c2e9, #c471ed, #f64f59);
+    font-family: system-ui,'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background: #5B9A8B; 
+    background-image: linear-gradient(to top, #445069, #5B9A8B); 
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
@@ -11,42 +11,87 @@ html {
 body {
     padding-bottom: 50px;
     font-weight:300;
-    color: #38135f;
+    color: #000000;
 }
 .shadow {
-    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.10);
 }
 h1 {
+    font-size:42pt;
     text-transform: uppercase;
     font-weight:lighter;
-    font-size:42pt;
     letter-spacing: .8rem;
     text-align: center;
-    margin-block: 90px;
+    margin-top: 70px;
+    margin-inline: 20px;
     color: #ffffff;
     text-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
+    animation-name: h1;
+    animation-delay: 50ms;
+    animation-duration: 0.5s;
+    animation-timing-function:ease;
+    animation-fill-mode: both;
 }
-a {
-    color: rgb(255, 255, 255);
+@keyframes h1 {
+    from{opacity: 0;}
+    to{opacity: 1;}
+}
+h4 {
+    text-transform: uppercase;
+    font-weight:lighter;
+    letter-spacing: .4rem;
+    text-align: center;
+    margin-bottom: 70px;
+    color: #ffffff;
+    text-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
+    animation-name: h4;
+    animation-delay: 100ms;
+    animation-duration: 0.5s;
+    animation-timing-function:ease;
+    animation-fill-mode: both;
+}
+@keyframes h4 {
+    from{opacity: 0;}
+    to{opacity: 1;}
+}
+a, li {
+    color: #ffffff;
+    padding: 3px;
+    animation-name: a-fade;
+    animation-delay: 300ms;
+    animation-duration: 0.5s;
+    animation-timing-function:ease;
+    animation-fill-mode: both;
+}
+@keyframes a-fade {
+    from{opacity: 0;}
+    to{opacity: 1;}
+}
+.tx-hilite {
+    color: #f3c22f;
+}
+.login-box {
+    width: 70%;
+    background-color: #ffffff32;
+    padding: 3%;
+    border-radius: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    animation-name: box-slideup;
+    animation-delay: 100ms;
+    animation-duration: 0.5s;
+    animation-timing-function: ease;
+    animation-fill-mode: both;
+}
+@keyframes box-slideup {
+    from{opacity: 0;}
+    to{opacity: 1;}
 }
 
-.vertical-center {
-    margin-top: 0px;
-}
 .logfield {
-    display: grid;
-    grid-template-columns: auto auto auto auto;
-    column-gap: 50px;
     margin-left: auto;
     margin-right: auto;
-    width: 60%;
-}
-.lognote {
-    margin-top: 10px;
-    margin-bottom: 90px;
-    margin-left: auto;
-    margin-right: auto;
-    width: 60%;
+    width: 90%;
 }
 label {
     color: #ffffff;
@@ -66,26 +111,35 @@ input {
     font-weight: 300;
     font-size: large;
     letter-spacing: .3rem;
-    background-image: linear-gradient(to bottom, #f9455a, #e83858);
-    color: rgb(255, 255, 255);
+    background-image: linear-gradient(to bottom, #F7E987, #f3c22f);
+    color: rgb(6, 6, 6);
     border-style: none;
     border-radius: 7px;
     width: 170px;
     height: 50px;
+    margin-top: 90px;
     margin-left: auto;
     margin-right: auto;
+    display: grid;
+    animation-name: btn-slideup;
+    animation-delay: 200ms;
+    animation-duration: 0.5s;
+    animation-timing-function:ease;
+    animation-fill-mode: both;
 }
-
+@keyframes btn-slideup {
+    from{opacity: 0;}
+    to{opacity: 1;}
+}
 table {
     border-collapse: collapse;
     border: 0px solid #ffffffaa;
-    margin-bottom: 70px;
-    width: 85%;
+    width: 100%;
 }
 th {
-    font-weight: 500;
+    font-weight: 400;
     line-height: 140%;
-    background-color: #ffffff3b;
+    background-color: #ffffff41;
     border: 1px solid #00000015;
     text-align: center;
     padding: 8px;
@@ -101,10 +155,10 @@ td {
     text-align: right;
 }
 tr:nth-child(odd) {
-    background-color: #ffffff51;
+    background-color: #ffffff60;
 }
 tr:nth-child(even) {
-    background-color: #ffffff38;
+    background-color: #ffffff4b;
 }
 .center {
     margin-left: auto;
@@ -115,6 +169,15 @@ tr:nth-child(even) {
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 10px;
+    animation-name: select;
+    animation-delay: 200ms;
+    animation-duration: 0.5s;
+    animation-timing-function:ease;
+    animation-fill-mode: both;
+}
+@keyframes select {
+    from{opacity: 0;}
+    to{opacity: 1;}
 }
 .get-table-btn {
     font-size: small;
@@ -133,11 +196,49 @@ select {
     width: 70%;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 40px;
     display: grid;
     justify-content: space-between;
     grid-template-columns: auto auto auto;
 }
-li {
-    color: rgb(255, 255, 255);
-    padding: 3px;
+
+/* responsive */
+* {
+    box-sizing: border-box;
+}
+.date-inp {
+    float: left;
+    width: 25%;
+    padding-inline: 1%;
+    /* margin-top: 10px; */
+}
+.income-inp {
+    float: left;
+    width: 25%;
+    padding-inline: 1%;
+    /* margin-top: 10px; */
+}
+.bank-inp {
+    float: left;
+    width: 25%;
+    padding-inline: 1%;
+    /* margin-top: 10px; */
+}
+.wallet-inp {
+    float: right;
+    width: 25%;
+    padding-inline: 1%;
+    /* margin-top: 10px; */
+}
+.lognote {
+    padding-inline: 1%;
+}
+@media screen and (max-width: 1000px) {
+    .date-inp, .income-inp, .bank-inp, .wallet-inp, .lognote {
+      width: 100%;
+      /* margin-top: 0px; */
+    }
+    h1 {
+        font-size: 6vw;
+    }
 }

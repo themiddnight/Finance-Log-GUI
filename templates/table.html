@@ -2,13 +2,14 @@
 
 <head>
     <title>Finance Logging - Table</title>
-    <link rel="icon" type="image/x-icon" href="../static/image/favicon.png">
+    <link rel="icon" href="../static/image/favicon.png">
     <link href="../static/style/style.css" rel="stylesheet" type="text/css">
     <link href="{{ url_for('static', filename='style/style.css') }}" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-    <h1 style="margin-bottom: 60px;">FINANCE : {{ ' '.join(table.split(' ')) }}</h1>
+    <h1>FINANCE : {{ ' '.join(table.split(' ')) }}</h1>
+    <h4 style="margin-bottom: 25px;">PATHOMPONG THITITHAN</h4>
     <div class="table-select">
         <form action="{{ url_for('table') }}" method="post">
             <label>Select table:</label>
@@ -24,85 +25,87 @@
             <input class="get-table-btn" type="submit" value="Go">
         </form>
     </div>
-    <table class="center shadow">
-        <tr>
-            <th style="width: 9%;">Date</th>
-            <th style="width: 9%;">Income</th>
-            <th style="width: 9%;">Bank<br> Spending</th>
-            <th style="width: 9%;">Wallet<br> Spending</th>
-            <th style="width: 9%;">Total<br> Spending</th>
-            <th style="width: 9%;">Bank<br> Remaining</th>
-            <th style="width: 9%;">Wallet<br> Remaining</th>
-            <th style="width: 37%;">Notes</th>
-        </tr>
-        {% for row in data %}
+    <div class="login-box shadow" style="width: 85%; padding: 20px; overflow-y: scroll; overflow-wrap:break-word;">
+        <table class="center">
             <tr>
-                <td>{{ row[1] }}</td>                                       <!-- date -->
-                {% if row[2] is not none %}                                 <!-- income -->
-                    <td class="td-numeric">{{ "{:,}".format(row[2]) }}</td>
-                {% else %}
-                    <td></td>
-                {% endif %}
-                {% if row[5] is not none %}                                 <!-- bank_dif -->
-                    <td class="td-numeric">{{ "{:,}".format(row[5]) }}</td>
-                {% else %}
-                    <td></td>
-                {% endif %}
-                {% if row[6] is not none %}                                 <!-- wallet_dif -->
-                    <td class="td-numeric">{{ "{:,}".format(row[6]) }}</td>
-                {% else %}
-                    <td></td>
-                {% endif %}
-                {% if row[7] is not none %}                                 <!-- total_dif -->
-                    <td class="td-numeric">{{ "{:,}".format(row[7]) }}</td>
-                {% else %}
-                    <td></td>
-                {% endif %}
-                <td class="td-numeric">{{ "{:,}".format(row[3]) }}</td>     <!-- bank -->
-                <td class="td-numeric">{{ "{:,}".format(row[4]) }}</td>     <!-- wallet -->
-                {% if row[8] is not none %}                                 <!-- notes -->
-                    <td>{{ row[8] }}</td>
-                {% else %}
-                    <td></td>
-                {% endif %}
+                <th style="width: 9%; padding-inline: 40px;">Date</th>
+                <th style="width: 9%; padding-inline: 20px;">Income</th>
+                <th style="width: 9%; padding-inline: 20px;">Bank<br> Remaining</th>
+                <th style="width: 9%; padding-inline: 20px;">Wallet<br> Remaining</th>
+                <th style="width: 9%; padding-inline: 20px;">Bank<br> Spending</th>
+                <th style="width: 9%; padding-inline: 20px;">Wallet<br> Spending</th>
+                <th style="width: 9%; padding-inline: 20px;">Total<br> Spending</th>
+                <th style="width: 37%; padding-inline: 100px;">Notes</th>
             </tr>
-        {% endfor %}
-        <tr>
-            <th>Grand Total:</th>
-            {% if sum[0] is not none %}     <!-- total income -->
-                <th class="td-numeric" style="text-align: center;">{{ "{:,}".format(sum[0]) }}</th>
-            {% else %}
+            {% for row in data %}
+                <tr>
+                    <td>{{ row[1] }}</td>                                       <!-- date -->
+                    {% if row[2] is not none %}                                 <!-- income -->
+                        <td class="td-numeric">{{ "{:,}".format(row[2]) }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                    <td class="td-numeric">{{ "{:,}".format(row[3]) }}</td>     <!-- bank -->
+                    <td class="td-numeric">{{ "{:,}".format(row[4]) }}</td>     <!-- wallet -->
+                    {% if row[5] is not none %}                                 <!-- bank_dif -->
+                        <td class="td-numeric">{{ "{:,}".format(row[5]) }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                    {% if row[6] is not none %}                                 <!-- wallet_dif -->
+                        <td class="td-numeric">{{ "{:,}".format(row[6]) }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                    {% if row[7] is not none %}                                 <!-- total_dif -->
+                        <td class="td-numeric">{{ "{:,}".format(row[7]) }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                    {% if row[8] is not none %}                                 <!-- notes -->
+                        <td>{{ row[8] }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            <tr>
+                <th>Grand Total:</th>
+                {% if sum[0] is not none %}     <!-- total income -->
+                    <th class="td-numeric" style="text-align: center;">{{ "{:,}".format(sum[0]) }}</th>
+                {% else %}
+                    <th></th>
+                {% endif %}
+                {% if sum[4] is not none %}     <!-- total remain -->
+                    <th class="td-numeric" colspan="2" style="text-align: center;">{{ "{:,}".format(sum[4]) }}</th>
+                {% else %}
+                    <th colspan="2"></th>
+                {% endif %}
+                {% if sum[1] is not none %}     <!-- total bank dif -->
+                    <th class="td-numeric" style="text-align: center;">{{ "{:,}".format(sum[1]) }}</th>
+                {% else %}
+                    <th></th>
+                {% endif %}
+                {% if sum[2] is not none %}     <!-- total wallet dif -->
+                    <th class="td-numeric" style="text-align: center;">{{ "{:,}".format(sum[2]) }}</th>
+                {% else %}
+                    <th></th>
+                {% endif %}
+                {% if sum[3] is not none %}     <!-- total dif -->
+                    <th class="td-numeric" style="text-align: center;">{{ "{:,}".format(sum[3]) }}</th>
+                {% else %}
+                    <th></th>
+                {% endif %}
                 <th></th>
-            {% endif %}
-            {% if sum[1] is not none %}     <!-- total bank dif -->
-                <th class="td-numeric" style="text-align: center;">{{ "{:,}".format(sum[1]) }}</th>
-            {% else %}
-                <th></th>
-            {% endif %}
-            {% if sum[2] is not none %}     <!-- total wallet dif -->
-                <th class="td-numeric" style="text-align: center;">{{ "{:,}".format(sum[2]) }}</th>
-            {% else %}
-                <th></th>
-            {% endif %}
-            {% if sum[3] is not none %}     <!-- total dif -->
-                <th class="td-numeric" style="text-align: center;">{{ "{:,}".format(sum[3]) }}</th>
-            {% else %}
-                <th></th>
-            {% endif %}
-            {% if sum[4] is not none %}     <!-- total remain -->
-                <th class="td-numeric" colspan="2" style="text-align: center;">{{ "{:,}".format(sum[4]) }}</th>
-            {% else %}
-                <th colspan="2"></th>
-            {% endif %}
-            <th></th>
-        </tr>
-    </table>
+            </tr>
+        </table>
+    </div>
     <div class="footer-btns">
         <p><a href="{{ url_for('index') }}"> Back to main</a></p>
         <p></p>
         <div style="text-align: start;">
             <li><a href="{{ url_for('deleterow', table = table) }}">Delete latest row</a></li>
-            <li><a href="{{ url_for('deletetable', table = table) }}">Delete current table</a></li>
+            <li><a href="{{ url_for('deletetable', table = table) }}">Delete this table</a></li>
         </div>
     </div>
 </body>
