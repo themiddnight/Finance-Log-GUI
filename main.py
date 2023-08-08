@@ -3,10 +3,10 @@ import json
 
 # get database path from json file
 with open('data/path.json', 'r') as f:
-    connection_path = json.load(f)['0']
+    db_path = json.load(f)['0'] # <--- put your db path file here
 
 def init(table):
-    connection = sqlite3.connect(connection_path)
+    connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     tables = get_tablelist()
     # check if it has tables, or current table exists
@@ -21,7 +21,7 @@ def init(table):
     connection.close()
 
 def get_tablelist():
-    connection = sqlite3.connect(connection_path)
+    connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     # get all tables
     cursor.execute("""--sql
@@ -49,26 +49,30 @@ def get_tablelist():
 
 
 def get_tabledata(table):
-    connection = sqlite3.connect(connection_path)
+    connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     # get entire table
     cursor.execute("""--sql
                    SELECT * FROM '{}';
                    """.format(table))
     data = cursor.fetchall()
-    sum_remain = data[-1][3] + data[-1][4]
-    # get sum
-    cursor.execute("""--sql
-                   SELECT SUM(income), SUM(bank_dif), SUM(wallet_dif), SUM(total_dif) FROM '{}';
-                   """.format(table))
-    sum = cursor.fetchone()
+    if data:
+        sum_remain = data[-1][3] + data[-1][4]
+        # get sum
+        cursor.execute("""--sql
+                    SELECT SUM(income), SUM(bank_dif), SUM(wallet_dif), SUM(total_dif) FROM '{}';
+                    """.format(table))
+        sum = cursor.fetchone()
+    else:
+        sum = [None,None,None,None]
+        sum_remain = None
     cursor.close()
     connection.close()
     # table data, sum
     return data, [sum[0], sum[1], sum[2], sum[3], sum_remain]
 
 def insert_data(table, date, income, bank, wallet, notes):
-    connection = sqlite3.connect(connection_path)
+    connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     # read 2 latest row
     cursor.execute("""--sql
@@ -82,15 +86,19 @@ def insert_data(table, date, income, bank, wallet, notes):
     # calculate difference
     if len(rows) >= 1:          # if it has a row prior to find difference
         if not income:
-            bank_dif   = (bank - rows[0][1])
+            bank_dif = (bank - rows[0][1])
         else:
-            bank_dif   = (bank - rows[0][1]) - income
+            bank_dif = (bank - rows[0][1]) - income
         wallet_dif = wallet - rows[0][2]
         total_dif  = bank_dif + wallet_dif
     else:
-        bank_dif   = None
+        if not income:
+            bank_dif  = None
+            total_dif = None
+        else:
+            bank_dif  = bank - income
+            total_dif = bank_dif
         wallet_dif = None
-        total_dif  = None
     # add item to table
     cursor.execute("""--sql
                    INSERT INTO '{}' (ID, date, income, bank, wallet, bank_dif, wallet_dif, total_dif, notes)
@@ -101,7 +109,7 @@ def insert_data(table, date, income, bank, wallet, notes):
     connection.close()
 
 def delete_row(table):
-    connection = sqlite3.connect(connection_path)
+    connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     # read latest row
     try:
@@ -120,7 +128,7 @@ def delete_row(table):
     connection.close()
 
 def delete_table(table):
-    connection = sqlite3.connect(connection_path)
+    connection = sqlite3.connect(db_path)
     cursor = connection.cursor()
     # read latest row
     try:
