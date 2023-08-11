@@ -73,7 +73,7 @@ a, li {
 .login-box {
     width: 70%;
     background-color: #ffffff32;
-    padding: 3%;
+    padding-block: 2%;
     border-radius: 20px;
     margin-left: auto;
     margin-right: auto;
@@ -186,7 +186,7 @@ tr:nth-child(even) {
 }
 select {
     background-color: #ffffff81;
-    width: 150px;
+    width: 125px;
     height: 25px;
     border-style: none;
     padding: 5px;
@@ -238,7 +238,30 @@ select {
       width: 100%;
       /* margin-top: 0px; */
     }
+    .login-box {
+        padding-inline: 3%;
+        padding-block: 4%;
+    }
     h1 {
         font-size: 6vw;
+    }
+}
+@media screen and (max-width: 500px) {
+    .date-inp, .income-inp, .bank-inp, .wallet-inp, .lognote {
+      width: 100%;
+      /* margin-top: 0px; */
+    }
+    h1 {
+        font-size: 20pt;
+        font-weight:light;
+        letter-spacing: .4rem;
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+    h4 {
+        display: none;
+    }
+    .button {
+        margin-top: 50px;
     }
 }
