@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Finance Logging - Table</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/image/favicon.png">
+    <link href="../static/style/style.css" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='style/style.css') }}" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <h1>FINANCE : {{ ' '.join(table.split(' ')) }}</h1>
+    <h4 style="margin-bottom: 25px;">PATHOMPONG THITITHAN</h4>
+    <div class="table-select">
+        <form action="{{ url_for('table') }}" method="post">
+            <label>Select table:</label>
+            <select name="item" style="margin-inline: 10px;">
+                {% for item in table_list %}
+                    {% if item == table %}
+                        <option value="{{ item }}" selected>{{ item }}</option>
+                    {% else %}
+                        <option value="{{ item }}">{{ item }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <input class="get-table-btn" type="submit" value="Go">
+        </form>
+    </div>
+    <div class="login-box shadow" style="width: 85%; padding: 20px; overflow-y: scroll; overflow-wrap:break-word;">
+        <img src="/simple.png" alt="Dynamic Image" />
+    </div>
+    <div class="footer-btns">
+        <p><a href="{{ url_for('index') }}"> Back to main</a></p>
+        <p></p>
+        <div style="text-align: start;">
+            <li><a href="{{ url_for('deleterow', table = table) }}">Delete latest row</a></li>
+            <li><a href="{{ url_for('deletetable', table = table) }}">Delete this table</a></li>
+        </div>
+    </div>
+</body>

@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import numpy as np
 
 # create/get database path from /User/Documents/ path
 home_dir = os.path.expanduser('~')
@@ -82,6 +83,26 @@ def get_tabledata(table):
     # table data, sum
     return data, [sum[0], sum[1], sum[2], sum[3], sum_remain]
 
+
+def get_rotate_table(table):
+    # get data
+    data, _ = get_tabledata(table)
+    if data:
+        arr = np.array(data)
+        # dataset
+        day_list = [i.split('-')[-1] for i in arr[:,1]]
+        income_list = [i if i is not None else 0 for i in arr[:,2]]
+        bank_list = arr[:,3]
+        wallet_list = arr[:,4]
+        bank_d_list = arr[:,5]
+        wallet_d_list = arr[:,6]
+        sum_remain = np.sum([bank_list, wallet_list], axis = 0)
+        note_list = []
+        for i in data:
+            note_list.append(i[8])
+        return (day_list, income_list, bank_list, wallet_list, 
+                bank_d_list, wallet_d_list, sum_remain, note_list)
+    return False
 
 def insert_data(table, date, income, bank, wallet, notes):
     connection = sqlite3.connect(db_path)

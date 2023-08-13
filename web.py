@@ -1,5 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, make_response
 from datetime import datetime
+import base64
+from matplotlib.figure import Figure
+from io import BytesIO
+import io
 import main
 
 app = Flask(__name__)
@@ -76,6 +80,40 @@ def table():
     return render_template('table.html', table_list=table_list,
                            table=now_table, data=table_data[0], 
                            sum=table_data[1])
+
+
+@app.route('/graph', methods=['GET', 'POST'])
+def graph():
+    now_table = request.args['table']
+    (day_list, income_list, bank_list, wallet_list, bank_d_list, wallet_d_list, sum_remain) = main.get_rotate_table(now_table)
+    # Generate the figure **without using pyplot**.
+    figure = Figure()
+
+    ax = figure.add_subplot(211)
+    ax.plot(day_list, bank_d_list, label = "Bank")
+    ax.plot(day_list, wallet_d_list, label = "Wallet")
+    ax.grid(linestyle = '--', linewidth = 0.3)
+    ax.legend()
+    ax.invert_yaxis()
+    ax.tick_params(axis="both")
+    ax.legend()
+
+    ax = figure.add_subplot(212)
+    ax.bar(day_list, income_list, label = "Income")
+    ax.plot(day_list, sum_remain, label = "Remaining")
+    ax.grid(linestyle = '--', linewidth = 0.3)
+    ax.legend()
+    ax.tick_params(axis="both")
+    ax.legend()
+    figure.subplots_adjust(left = 0.07, bottom = 0.08,
+                            right = 0.95, top = 0.94)
+    buffer = io.BytesIO()
+    figure.savefig(buffer, format="png")
+    buffer.seek(0)
+
+    response = make_response(buffer.getvalue())
+    response.mimetype = "image/png"
+    return response
 
 
 if __name__ == '__main__':

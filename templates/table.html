@@ -11,21 +11,22 @@
 <body>
     <h1>FINANCE : {{ ' '.join(table.split(' ')) }}</h1>
     <h4 style="margin-bottom: 25px;">PATHOMPONG THITITHAN</h4>
-    <div class="table-select">
-        <form action="{{ url_for('table') }}" method="post">
-            <label>Select table:</label>
-            <select name="item" style="margin-inline: 10px;">
-                {% for item in table_list %}
-                    {% if item == table %}
-                        <option value="{{ item }}" selected>{{ item }}</option>
-                    {% else %}
-                        <option value="{{ item }}">{{ item }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-            <input class="get-table-btn" type="submit" value="Go">
-        </form>
-    </div>
+        <div class="table-select">
+            <form action="{{ url_for('table') }}" method="post">
+                <label>Select table:</label>
+                <select name="item" style="margin-inline: 10px;">
+                    {% for item in table_list %}
+                        {% if item == table %}
+                            <option value="{{ item }}" selected>{{ item }}</option>
+                        {% else %}
+                            <option value="{{ item }}">{{ item }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input class="get-table-btn" type="submit" value="Go">
+                <a href="{{ url_for('graph', table = table) }}">View graph</a>
+            </form>
+        </div>
     <div class="login-box shadow" style="width: 85%; padding: 20px; overflow-y: scroll; overflow-wrap:break-word;">
         <table class="center">
             <tr>
