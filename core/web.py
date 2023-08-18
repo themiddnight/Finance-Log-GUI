@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response
+from flask import Flask, render_template, request, make_response, Response
 from datetime import datetime
 import base64
 from matplotlib.figure import Figure
@@ -21,6 +21,7 @@ def index():
 
 @app.route('/table/add-table', methods=['GET', 'POST'])
 def addtable():
+    Response.json()
     date = request.form['date']
     table = '{} {}'.format(main.get_month_name(date.split('-')[1]),
                            date.split('-')[0])
