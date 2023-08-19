@@ -83,12 +83,12 @@ class UIView(Tk):
         self.get_tabl_frm.pack (fill = 'both', pady = (15, 0), padx = 20)
         self.sel_tabl_l.pack   (side = 'left')
         self.sel_tabl_comb.pack(side = 'left')
-        self.del_tabl_btn.pack (side = 'right')
-        self.del_row_btn.pack  (side = 'right', padx = 10)
+        self.del_tabl_btn.pack (side = 'right', ipadx = 10)
+        self.del_row_btn.pack  (side = 'right', ipadx = 10, padx = 10)
 
-        self.tab_view.add(self.table_frm, text = 'Table')
-        self.tab_view.add(self.graph_frm, text = 'Graph')
-        self.tab_view.pack(fill = 'both', expand = 1)
+        self.tab_view.add(self.table_frm, text = f'{"Table": ^20s}') 
+        self.tab_view.add(self.graph_frm, text = f'{"Graph": ^20s}')
+        self.tab_view.pack(fill = 'both', expand = 1, pady = 5)
 
         self.scrl_table.pack  (side = 'right', fill = 'y')
         self.finance_tabl.pack(fill = 'both', expand = 1)
@@ -107,7 +107,7 @@ class UIView(Tk):
         self.cash_ent.grid  (row = 1, column = 3, padx = 5)
         self.notes_l.grid   (sticky='w', row=0, column=4, padx=5, pady=(5,0))
         self.notes_ent.grid (row = 1, column = 4, padx = 5)
-        self.submit_btn.grid(row = 1, column = 5, padx = 5)
+        self.submit_btn.grid(row = 1, column = 5, padx = 5, ipadx = 10)
 
 
         # ---------- validate / get events ----------
