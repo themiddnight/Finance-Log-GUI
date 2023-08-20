@@ -11,7 +11,7 @@ class UIview(Tk):
         self.theme_list = self.controller.get_theme_list()
 
         self.title('Finance Logging')
-        self.minsize(1024, 430)
+        self.minsize(1124, 430)
         icon = PhotoImage(file = "core/image/icon.png")
         self.iconphoto(False, icon)
 
@@ -162,7 +162,7 @@ class UIview(Tk):
                 parent = '', index = 'end', iid = i[0],
                 values = (i[1], i[2], i[3], i[4]
                           ,i[5], i[6], i[7], i[8]))
-        sep = 15
+        sep = 17
         self.finance_tabl.insert(
             parent = '', index = 'end', 
             values = ('-' * sep, '-' * sep, '-' * sep, '-' * sep
