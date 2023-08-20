@@ -33,7 +33,7 @@ class Controller:
         '''Set the latest table as current table. 
         If no table, create current date as a new one.'''
         try:        # set latest table as init table
-            table_list = self.model.get_table_list()
+            table_list = self.get_table_list()
             self.model.table = table_list[-1]
         except:     # if no table list, pass it and use default
             self.model.new_table()
@@ -69,7 +69,23 @@ class Controller:
 
 
     def get_table_list(self) -> tuple:
-        return self.model.get_table_list()
+        table_list_raw = self.model.get_table_list()
+        if table_list_raw:
+            table_list_raw.remove(('sqlite_sequence',))
+            table_list = [i[0] for i in table_list_raw]
+            def get_month_year(date_str):   # sorting table name
+                months = {'January': 1, 'February': 2, 'March': 3, 
+                        'April': 4, 'May': 5, 'June': 6, 'July': 7, 
+                        'August': 8, 'September': 9, 'October': 10, 
+                        'November': 11, 'December': 12}
+                month, year = date_str.split(' ')
+                return (year, months[month])
+            # Sort the list using the custom sorting key
+            sorted_table_list = sorted(table_list, key = get_month_year)
+        else:
+            # tables_list = None
+            sorted_table_list = None
+        return sorted_table_list
     
 
     def set_current_table(self, table: str):

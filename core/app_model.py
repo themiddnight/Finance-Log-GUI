@@ -20,8 +20,10 @@ class DataManage:
         self.bank   = 0
         self.cash   = 0
         self.notes  = ''
-        self.pref = {"app_geometry":"1024x600+350+200", 
+        self.pref = {"app_geometry":"1124x600+350+200", 
                      "app_theme":"bright"}
+        self.columns = ['date', 'income', 'bank', 'cash', 
+                        'bank_dif', 'cash_dif', 'total_dif', 'notes']
         
 
     def load_pref(self):
@@ -38,23 +40,17 @@ class DataManage:
     def save_pref(self):
         with open(self.pref_path, 'w') as f:
             json.dump(self.pref, f)
-
-
-    def set_table_name(self):
-        month = self.date.split('-')[1]
-        year = self.date.split('-')[2]
-        self.table = '{} {}'.format(month, year)
     
 
     def new_table(self):
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
-        cursor.execute("""--sql
-                    CREATE TABLE '{}' 
+        cursor.execute(f"""--sql
+                    CREATE TABLE '{self.table}' 
                     (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                     date TEXT, income NUMERIC, bank NUMERIC, 
                     cash NUMERIC, bank_dif NUMERIC, cash_dif NUMERIC, 
-                    total_dif NUMERIC, notes TEXT);""".format(self.table))
+                    total_dif NUMERIC, notes TEXT);""")
         cursor.close()
         connection.close()
 
@@ -70,22 +66,7 @@ class DataManage:
         data = cursor.fetchall()
         cursor.close()
         connection.close()
-        if data:
-            data.remove(('sqlite_sequence',))
-            tables_list = [i[0] for i in data]
-            def get_month_year(date_str):   # sorting table name
-                months = {'January': 1, 'February': 2, 'March': 3, 
-                        'April': 4, 'May': 5, 'June': 6, 'July': 7, 
-                        'August': 8, 'September': 9, 'October': 10, 
-                        'November': 11, 'December': 12}
-                month, year = date_str.split(' ')
-                return (year, months[month])
-            # Sort the list using the custom sorting key
-            sorted_table_list = sorted(tables_list, key = get_month_year)
-        else:
-            # tables_list = None
-            sorted_table_list = None
-        return sorted_table_list
+        return data
 
 
     def get_table_data(self) -> list | None:
@@ -94,9 +75,9 @@ class DataManage:
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
         # get entire table
-        cursor.execute("""--sql
-                        SELECT * FROM '{}';
-                        """.format(self.table))
+        cursor.execute(f"""--sql
+                        SELECT * FROM '{self.table}';
+                        """)
         data = cursor.fetchall()
         cursor.close()
         connection.close()
@@ -108,9 +89,9 @@ class DataManage:
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
         # get sum
-        cursor.execute("""--sql
+        cursor.execute(f"""--sql
                     SELECT SUM(income), SUM(bank_dif), SUM(cash_dif), 
-                    SUM(total_dif) FROM '{}';""".format(self.table))
+                    SUM(total_dif) FROM '{self.table}';""")
         sum = cursor.fetchone()
         cursor.close()
         connection.close()
@@ -122,13 +103,9 @@ class DataManage:
         [bank_d], [cash_d], [sum_d], [notes]), [sum_remain]'''
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
-        cursor.execute("""PRAGMA table_info("{}")""".format(self.table))
-        columns_info = cursor.fetchall()
-        columns = [col[1] for col in columns_info]
-        columns.pop(0)
         column_datas = []
-        for col in columns:
-            cursor.execute("""SELECT {} FROM '{}'""".format(col, self.table))
+        for col in self.columns:
+            cursor.execute(f"""SELECT {col} FROM '{self.table}'""")
             data = cursor.fetchall()
             column_datas.append([i[0] for i in data])
         cursor.close()
@@ -141,10 +118,9 @@ class DataManage:
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
         # read 2 latest row
-        cursor.execute("""--sql
-                    SELECT ID, bank, cash FROM '{}'
-                    ORDER by ID DESC;
-                    """.format(self.table))
+        cursor.execute(f"""--sql
+                    SELECT ID, bank, cash FROM '{self.table}'
+                    ORDER by ID DESC;""")
         rows = cursor.fetchmany(2) 
         # calculate difference
         if len(rows) >= 1:  # if it has a row prior to find difference
@@ -179,14 +155,12 @@ class DataManage:
         cursor = connection.cursor()
         # read latest row
         try:
-            cursor.execute("""--sql
-                        SELECT ID FROM '{}'
-                        ORDER by ID DESC;
-                        """.format(self.table))
+            cursor.execute(f"""--sql
+                        SELECT ID FROM '{self.table}'
+                        ORDER by ID DESC;""")
             id = cursor.fetchone()[0]
-            cursor.execute("""--sql
-                        DELETE from '{}' WHERE rowid = {}
-                        """.format(self.table, id))
+            cursor.execute(f"""--sql
+                        DELETE from '{self.table}' WHERE rowid = {id}""")
             connection.commit()
         except:
             pass
@@ -199,9 +173,8 @@ class DataManage:
         cursor = connection.cursor()
         # read latest row
         try:
-            cursor.execute("""--sql
-                        DROP TABLE '{}';
-                        """.format(self.table))
+            cursor.execute(f"""--sql
+                        DROP TABLE '{self.table}';""")
             connection.commit()
         except:
             pass
@@ -212,9 +185,9 @@ class DataManage:
     def edit_row(self, id: int, date: str, notes: str):
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
-        cursor.execute("""--sql
-                       UPDATE "{}" SET date = "{}", notes = "{}" WHERE ID = {};
-                       """.format(self.table, date, notes, id))
+        cursor.execute(f"""--sql
+                       UPDATE "{self.table}" SET date = "{date}", 
+                       notes = "{notes}" WHERE ID = {id};""")
         connection.commit()
         cursor.close()
         connection.close()
