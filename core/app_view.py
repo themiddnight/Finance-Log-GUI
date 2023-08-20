@@ -236,9 +236,12 @@ class UIview(Tk):
         cash   = self.cash_ent.get()
         notes  = self.notes_ent.get()
         check  = self.controller.submit_data(date, income, bank, cash, notes)
+        focused = self.focus_get()
         if check == False:
             messagebox.showerror(title = 'Value is not valid!'
                                  ,message = 'Please check your input.')
+            self.focus()
+            focused.focus()
         else:
             self.income_ent.delete(0, 'end')
             self.bank_ent.delete(0, 'end')
@@ -330,9 +333,9 @@ class UIedit(Toplevel):
 
     def submit_edit(self, *args):
         day_new   = self.edit_day_ent.get()
-        date_new  = self.ym_str + "{:02d}".format(int(day_new))
-        notes_new = self.edit_notes_ent.get()
         if day_new.isnumeric() == True:
+            date_new  = self.ym_str + "{:02}".format(int(day_new))
+            notes_new = self.edit_notes_ent.get()
             self.controller.edit_row(self.sel_id, date_new, notes_new)
             self.destroy()
             self.mainview.refresh_ui()

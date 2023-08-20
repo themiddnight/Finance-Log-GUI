@@ -131,36 +131,59 @@ class Controller:
         '''Returns ([day], [income], [bank], [cash], 
         [bank_d], [cash_d], [sum_d], [notes]), [sum_remain]'''
         cols_data, sum_remain = self.model.get_rotate_table()
-        date_ls   = [i.split('-')[-1] for i in cols_data[0]]
-        income_ls = [0 if i is None else i for i in cols_data[1]]
+        date_ls   = list(map(lambda x: x.split('-')[-1],cols_data[0]))
+        income_ls = list(map(lambda x: 0 if x is None else x,cols_data[1]))
         bank_ls   = cols_data[2]
         cash_ls   = cols_data[3]
         bank_d_ls = cols_data[4]
         cash_d_ls = cols_data[5]
-        sum_d_ls  = [0 if i is None else i for i in cols_data[6]]
-        notes_ls  = ['' if i is None else i for i in cols_data[7]]
+        sum_d_ls  = list(map(lambda x:  0 if x is None else x, cols_data[6]))
+        notes_ls  = list(map(lambda x: '' if x is None else x, cols_data[7]))
         return (date_ls, income_ls, bank_ls, cash_ls, 
                 bank_d_ls, cash_d_ls, sum_d_ls, notes_ls), sum_remain
     
 
-    def submit_data(self, date: str, income:int| float, bank:int| float, 
-                    cash: int| float, notes: str) -> bool:
+    def submit_data(self, date, income, bank, cash, notes) -> bool:
         try:
-            self.model.date = date
-            if income == '':
-                self.model.income = None
-            else:
-                self.model.income = self.fmt_num_in(float(income))
+            self.model.date  = date
             self.model.bank  = self.fmt_num_in(float(bank))
             self.model.cash  = self.fmt_num_in(float(cash))
             self.model.notes = str(notes)
             month = self.months_name[date.split('-')[1]]
             year  = date.split('-')[0]
             self.model.table = '{} {}'.format(month, year)
+
             # check if current table exists in db
-            table_list = self.model.get_table_list()
+            table_list = self.get_table_list()
             if self.model.table not in table_list:
                 self.model.new_table()
+
+            # if it has prior data to find difference
+            if self.model.get_table_data():  
+                data = self.model.get_table_data()[-1]
+                bank_prior = float(data[3])
+                cash_prior = float(data[4])
+                # calculate difference
+                if income == '':
+                    self.model.income = None
+                    bank_dif = round((float(bank) - bank_prior), 2)
+                else:
+                    self.model.income = self.fmt_num_in(float(income))
+                    bank_dif = round(((float(bank) - bank_prior) - float(income)), 2)
+                cash_dif  = round((float(cash) - cash_prior), 2)
+                total_dif = round((bank_dif + cash_dif), 2)
+                self.model.bank_dif  = self.fmt_num_in(float(bank_dif))
+                self.model.cash_dif  = self.fmt_num_in(float(cash_dif))
+                self.model.total_dif = self.fmt_num_in(float(total_dif))
+            else:
+                if not income:
+                    self.model.bank_dif  = None
+                    self.model.total_dif = None
+                else:
+                    bank_dif = round((bank - income), 2)
+                    self.model.total_dif = bank_dif
+                self.model.cash_dif = None
+
             self.model.insert_data()
             return True
         except ValueError:
@@ -176,9 +199,12 @@ class Controller:
         self.init_table()
 
 
-    def edit_row(self, *args):
+    def edit_row(self, id, date_new, notes_new):
         '''id, date, notes'''
-        self.model.edit_row(*args)
+        self.model.id    = id
+        self.model.date  = date_new
+        self.model.notes = notes_new
+        self.model.edit_row()
 
 
     def run(self):
