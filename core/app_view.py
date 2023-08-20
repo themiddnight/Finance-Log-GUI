@@ -22,7 +22,7 @@ class UIview(Tk):
         self.get_tabl_frm  = ttk.Frame(self)
         self.sel_tabl_l    = ttk.Label(self.get_tabl_frm, text = 'Select table:')
         self.sel_tabl_comb = ttk.Combobox(self.get_tabl_frm, state = 'readonly')
-        self.theme_btn = ttk.Button(self.get_tabl_frm, text='☀︎', width = 0, 
+        self.theme_btn = ttk.Button(self.get_tabl_frm, text='☀︎', width = 2,
                                         command = self.toggle_theme)
         self.del_tabl_btn  = ttk.Button(self.get_tabl_frm, text = 'Delete This Table'
                                         ,command = self.delete_table)
@@ -55,7 +55,7 @@ class UIview(Tk):
         self.graph_canvas = FigureCanvasTkAgg(self.figure, master = self.graph_frm)
 
         # input frame
-        inp_w = 14
+        inp_w = 18
         self.input_frm   = ttk.Labelframe(self, text = 'Insert Data:')
         self.date_l      = ttk.Label(self.input_frm, text = 'Date: *')
         self.date_ent    = DateEntry(self.input_frm, date_pattern = 'yyyy-MM-dd'
@@ -79,9 +79,9 @@ class UIview(Tk):
         self.get_tabl_frm.pack (fill = 'both', pady = (15, 0), padx = 20)
         self.sel_tabl_l.pack   (side = 'left')
         self.sel_tabl_comb.pack(side = 'left')
-        self.theme_btn.pack(side = 'right', ipadx = 0)
-        self.del_tabl_btn.pack (side = 'right', padx = 10)
-        self.del_row_btn.pack  (side = 'right', ipadx = 10, padx = 0)
+        self.theme_btn.pack(side = 'right')
+        self.del_tabl_btn.pack (side = 'right', ipadx = 10, padx = 5)
+        self.del_row_btn.pack  (side = 'right', ipadx = 10)
 
         self.tab_view.add(self.table_frm, text = f'{"Table": ^20}') 
         self.tab_view.add(self.graph_frm, text = f'{"Graph": ^20}')
@@ -194,8 +194,10 @@ class UIview(Tk):
         ax1.set_ylabel('Spending', color = self.theme["ylabel"], labelpad = 14)
         ax1.yaxis.set_label_position("right")
         ax1.yaxis.label.set_size(9)
-        ax1.legend(fontsize = 9, labelcolor = self.theme["legend"]["labelcolor"], 
-                  facecolor = self.theme["legend"]["facecolor"], edgecolor = self.theme["legend"]["edgecolor"])
+        ax1.legend(fontsize = 9, draggable = True, 
+                   labelcolor = self.theme["legend"]["labelcolor"], 
+                   facecolor = self.theme["legend"]["facecolor"], 
+                   edgecolor = self.theme["legend"]["edgecolor"])
         try:
             max_spnd = min(cols_data[6])
             ax1.set_ylim(top = 0, bottom = max_spnd + (max_spnd*0.05))
@@ -214,12 +216,15 @@ class UIview(Tk):
         ax2.set_ylabel('Income\n& Remaining', color = self.theme["ylabel"], labelpad = 9)
         ax2.yaxis.set_label_position("right")
         ax2.yaxis.label.set_size(9)
-        ax2.legend(fontsize = 9, labelcolor = self.theme["legend"]["labelcolor"], 
-                  facecolor = self.theme["legend"]["facecolor"], edgecolor = self.theme["legend"]["edgecolor"])
+        ax2.legend(fontsize = 9, draggable = True, 
+                   labelcolor = self.theme["legend"]["labelcolor"], 
+                   facecolor = self.theme["legend"]["facecolor"], 
+                   edgecolor = self.theme["legend"]["edgecolor"])
         for i in range(len(cols_data[0])):
             ax2.annotate(cols_data[7][i], xy = (i, 0), xytext = (-5,10)
                         ,textcoords = 'offset points', rotation = 60
-                        ,fontsize = 10, fontname = 'Tahoma', color = self.theme["legend"]["labelcolor"])
+                        ,fontsize = 10, fontname = 'Tahoma'
+                        ,color = self.theme["legend"]["labelcolor"])
             
         self.graph_canvas.draw()
 
@@ -324,7 +329,7 @@ class UIedit(Toplevel):
 
     def submit_edit(self, *args):
         day_new   = self.edit_day_ent.get()
-        date_new  = self.ym_str + day_new
+        date_new  = self.ym_str + "{:02d}".format(int(day_new))
         notes_new = self.edit_notes_ent.get()
         if day_new.isnumeric() == True:
             self.controller.edit_row(self.sel_id, date_new, notes_new)

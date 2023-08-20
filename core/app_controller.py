@@ -161,6 +161,7 @@ class Controller:
 
 
     def edit_row(self, *args):
+        '''id, date, notes'''
         self.model.edit_row(*args)
 
 
