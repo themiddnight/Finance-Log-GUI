@@ -4,28 +4,25 @@ from tkcalendar import DateEntry
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-class UIView(Tk):
+class UIview(Tk):
     def __init__(self, controller):
         super().__init__()
         
         self.controller = controller
-        self.edit_win = None
 
         self.title('Finance Logging')
-        self.minsize(1000, 430)
-        photo = PhotoImage(file = "core/image/icon.png")
-        self.iconphoto(False, photo)
-
-        self.style = ttk.Style()
-        self.style.configure('TEntry', background = None)
+        self.minsize(1024, 430)
+        icon = PhotoImage(file = "core/image/icon.png")
+        self.iconphoto(False, icon)
 
 
         # ---------- create widget -----------
 
-        # select table
+        # select table frame
         self.get_tabl_frm  = ttk.Frame(self)
         self.sel_tabl_l    = ttk.Label(self.get_tabl_frm, text = 'Select table:')
         self.sel_tabl_comb = ttk.Combobox(self.get_tabl_frm, state = 'readonly')
+        self.grphcolor_btn = ttk.Button(self.get_tabl_frm, text='🔆', width = 0)
         self.del_tabl_btn  = ttk.Button(self.get_tabl_frm, text = 'Delete This Table'
                                         ,command = self.delete_table)
         self.del_row_btn   = ttk.Button(self.get_tabl_frm, text = 'Delete Latest Row'
@@ -57,8 +54,7 @@ class UIView(Tk):
         self.graph_canvas = FigureCanvasTkAgg(self.figure, master = self.graph_frm)
         self.graph_canvas.get_tk_widget().configure(background = "#222222")
 
-        # input
-        # self.input_ttl_l = ttk.Label(text = 'Insert Data:')
+        # input frame
         inp_w = 14
         self.input_frm   = ttk.Labelframe(self, text = 'Insert Data:')
         self.date_l      = ttk.Label(self.input_frm, text = 'Date: *')
@@ -83,11 +79,12 @@ class UIView(Tk):
         self.get_tabl_frm.pack (fill = 'both', pady = (15, 0), padx = 20)
         self.sel_tabl_l.pack   (side = 'left')
         self.sel_tabl_comb.pack(side = 'left')
-        self.del_tabl_btn.pack (side = 'right', ipadx = 10)
-        self.del_row_btn.pack  (side = 'right', ipadx = 10, padx = 10)
+        self.grphcolor_btn.pack(side = 'right', ipadx = 0)
+        self.del_tabl_btn.pack (side = 'right', padx = 10)
+        self.del_row_btn.pack  (side = 'right', ipadx = 10, padx = 0)
 
-        self.tab_view.add(self.table_frm, text = f'{"Table": ^20s}') 
-        self.tab_view.add(self.graph_frm, text = f'{"Graph": ^20s}')
+        self.tab_view.add(self.table_frm, text = f'{"Table": ^20}') 
+        self.tab_view.add(self.graph_frm, text = f'{"Graph": ^20}')
         self.tab_view.pack(fill = 'both', expand = 1, pady = 5)
 
         self.scrl_table.pack  (side = 'right', fill = 'y')
@@ -95,7 +92,6 @@ class UIView(Tk):
 
         self.graph_canvas.get_tk_widget().pack(expand = 1, fill = 'both')
 
-        # self.input_ttl_l.pack(anchor = 'nw', padx = 12, pady = (0, 5))
         self.input_frm.pack (padx = 20, pady = (0, 20), ipadx = 5, ipady = 3)
         self.date_l.grid    (sticky='w', row=0, column=0, padx=5, pady=(5,0))
         self.date_ent.grid  (row = 1, column = 0, padx = 5)
@@ -168,37 +164,45 @@ class UIView(Tk):
         # [day, income, bank, cash, bank_d, cash_d, sum_d, notes], sum_remain
         cols_data, sum_remain = self.controller.get_rotate_table()
         self.figure.clear()
-        max_spnd = min(cols_data[6])
-        ax = self.figure.add_subplot(211, facecolor = '#131313')
-        ax.plot(cols_data[0], cols_data[6], label = "Summary", color = '#383838')
-        ax.fill_between(cols_data[0], cols_data[6],0, color = '#383838')
-        ax.plot(cols_data[0], cols_data[4], label = "Bank")
-        ax.plot(cols_data[0], cols_data[5], label = "Cash")
-        ax.grid(linestyle = '--', linewidth = 0.1)
-        ax.set_ylim(top = 0, bottom = max_spnd + (max_spnd*0.05))
-        ax.invert_yaxis()
-        ax.tick_params(axis = "both", colors = "white", labelsize = 8)
-        ax.set_ylabel('Spending', color = 'white', labelpad = 14)
-        ax.yaxis.label.set_size(9)
-        ax.yaxis.set_label_position("right")
-        ax.legend(fontsize = 9, labelcolor = 'white', 
-                  facecolor = "#333333", edgecolor = "#444444")
-
-        ax = self.figure.add_subplot(212, facecolor = '#131313')
-        ax.bar(cols_data[0], cols_data[1], label = "Income", alpha = 0.3)
-        ax.plot(cols_data[0], sum_remain, label = "Remaining")
-        ax.grid(linestyle = '--', linewidth = 0.1)
-        ax.tick_params(axis = "both", colors = "white", labelsize = 8)
-        ax.set_ylabel('Income\n& Remaining', color = 'white', labelpad = 9)
-        ax.yaxis.set_label_position("right")
-        ax.yaxis.label.set_size(9)
-        ax.legend(fontsize = 9, labelcolor = 'white', 
-                  facecolor = "#333333", edgecolor = "#444444")
         self.figure.subplots_adjust(left = 0.07, bottom = 0.08,
-                                right = 0.94, top = 0.94)
+                                    right = 0.94, top = 0.94)
         
+        ax1 = self.figure.add_subplot(211, facecolor = '#131313')
+        ax1.fill_between(cols_data[0], cols_data[6], 0, label = "Summary", 
+                        color = 'tab:gray', alpha = 0.3)
+        ax1.plot(cols_data[0], cols_data[4], label = "Bank", color = 'tab:blue')
+        ax1.plot(cols_data[0], cols_data[5], label = "Cash", color = 'tab:orange')
+        ax1.grid(linestyle = '--', linewidth = 0.2)
+        ax1.tick_params(axis = "both", colors = "white", labelsize = 8)
+        for i in ax1.spines:
+            ax1.spines[i].set_color('#222222')
+        ax1.set_ylabel('Spending', color = 'white', labelpad = 14)
+        ax1.yaxis.set_label_position("right")
+        ax1.yaxis.label.set_size(9)
+        ax1.legend(fontsize = 9, labelcolor = 'white', 
+                  facecolor = "#333333", edgecolor = "#444444")
+        try:
+            max_spnd = min(cols_data[6])
+            ax1.set_ylim(top = 0, bottom = max_spnd + (max_spnd*0.05))
+        except:
+            pass
+        ax1.invert_yaxis()
+
+        ax2 = self.figure.add_subplot(212, facecolor = '#131313')
+        ax2.bar(cols_data[0], cols_data[1], label = "Income", 
+               alpha = 0.3, color = 'tab:cyan')
+        ax2.plot(cols_data[0], sum_remain, label = "Remaining", color = 'tab:purple')
+        ax2.grid(linestyle = '--', linewidth = 0.2)
+        ax2.tick_params(axis = "both", colors = "white", labelsize = 8)
+        for i in ax2.spines:
+            ax2.spines[i].set_color('#222222')
+        ax2.set_ylabel('Income\n& Remaining', color = 'white', labelpad = 9)
+        ax2.yaxis.set_label_position("right")
+        ax2.yaxis.label.set_size(9)
+        ax2.legend(fontsize = 9, labelcolor = 'white', 
+                  facecolor = "#333333", edgecolor = "#444444")
         for i in range(len(cols_data[0])):
-            ax.annotate(cols_data[7][i], xy = (i, 0), xytext = (-5,10)
+            ax2.annotate(cols_data[7][i], xy = (i, 0), xytext = (-5,10)
                         ,textcoords = 'offset points', rotation = 60
                         ,fontsize = 10, fontname = 'Tahoma', color = '#cccccc')
             
@@ -242,13 +246,28 @@ class UIView(Tk):
 
 
     def edit_table_win(self, *args):
-        self.sel_id = self.finance_tabl.focus()
-        sel = self.finance_tabl.item(self.sel_id)
+        if self.finance_tabl.focus().isnumeric() == True:
+            edit_window = UIedit(self, self.controller)
+            edit_window.transient(self)
+            edit_window.grab_set()
+
+        
+class UIedit(Toplevel):
+    def __init__(self, mainview, controller):
+        super().__init__()
+
+        self.mainview = mainview
+        self.controller = controller
+        
+        self.sel_id = self.mainview.finance_tabl.focus()
+        sel         = self.mainview.finance_tabl.item(self.sel_id)
         date, _, _, _, _, _, _, notes = sel.get("values")
-        yyyymmdd = date.split('-')
-        day      = yyyymmdd.pop(2)
-        yyyymm   = '-'.join(yyyymmdd)
-        main_geo = self.geometry()
+        ymd_list = date.split('-')
+        day      = ymd_list.pop(2)
+        self.ym_str   = '-'.join(ymd_list) + '-'
+
+        # to make edit ui centered to the main ui
+        main_geo   = self.mainview.geometry()
         dimensions = []
         for part in main_geo.split('x'):
             dimensions.extend([int(dim) for dim in part.split('+')])
@@ -257,58 +276,51 @@ class UIView(Tk):
         main_cen_y = round(main_y + (main_h / 2))
 
         # generate ui
-        if self.edit_win:
-            self.edit_win.destroy()
-        self.edit_win = Toplevel(self)
-        self.edit_win.attributes('-topmost', 'true')
-        self.edit_win.resizable(False, False)
-
-        self.edit_win.title(f'Edit: {date}')
-        self.edit_win.geometry('550x100+{}+{}'.format
-                               (main_cen_x - 275, main_cen_y - 50))
-        self.edit_win.minsize(550, 100)
+        self.title   (f'Edit: {date}')
+        self.geometry('550x100+{}+{}'.format(main_cen_x - 275, main_cen_y - 50))
+        self.minsize (550, 100)
     
-        self.edit_frm = ttk.Frame(self.edit_win)
-        self.edit_frm.pack(padx = 10, pady = (10, 5))
-        ttk.Label(self.edit_frm,text='Date:').grid(
-            sticky = 'w',row = 0, column = 0)
-        self.date_frm = ttk.Frame(self.edit_frm)
-        self.date_frm.grid(
-            sticky = 'w',row = 1, column = 0, padx = (0, 10))
-        self.yyyymm = ttk.Label(self.date_frm, text = yyyymm + '-')
-        self.yyyymm.pack(side = 'left')
-        self.edit_day_ent = ttk.Entry(self.date_frm, width = 3)
-        self.edit_day_ent.pack(side = 'left')
-        self.edit_day_ent.insert(0, day)
-        ttk.Label(self.edit_frm, text = 'Notes: ').grid(
-            sticky = 'w', row = 0, column = 1, padx = 5)
+        self.edit_frm       = ttk.Frame(self)
+        self.date_l         = ttk.Label(self.edit_frm,text='Date:')
+        self.date_frm       = ttk.Frame(self.edit_frm)
+        self.yyyymm_l       = ttk.Label(self.date_frm, text = self.ym_str)
+        self.edit_day_ent   = ttk.Spinbox(self.date_frm, width = 3, 
+                                          from_ = 1, to = 31, wrap = True)
+        self.edit_notes_l   = ttk.Label(self.edit_frm, text = 'Notes: ')
         self.edit_notes_ent = ttk.Entry(self.edit_frm, width = 40)
-        self.edit_notes_ent.grid(row = 1, column = 1, padx = 5)
+        submit_btn          = ttk.Button(self, text = 'Submit', 
+                                         command = self.submit_edit)
+
+        self.edit_day_ent.insert(0, day)
         self.edit_notes_ent.insert(0, notes[2:])
-        submit_btn = ttk.Button(self.edit_win, text = 'Submit'
-                                ,command = self.submit_edit)
-        submit_btn.pack(pady = (0, 10))
+
+        self.edit_frm.pack      (padx = 10, pady = (10, 5))
+        self.date_l.grid        (sticky = 'w',row = 0, column = 0)
+        self.date_frm.grid      (sticky = 'w',row = 1, column = 0, padx = (0, 10))
+        self.yyyymm_l.pack      (side = 'left')
+        self.edit_day_ent.pack  (side = 'left')
+        self.edit_notes_l.grid  (sticky = 'w', row = 0, column = 1, padx = 5)
+        self.edit_notes_ent.grid(row = 1, column = 1, padx = 5)
+        submit_btn.pack         (pady = (0, 10))
 
         self.edit_day_ent.bind('<Return>', self.submit_edit)
         self.edit_notes_ent.bind('<Return>', self.submit_edit)
-        # self.edit_win.bind('<Button-1>', self.lift())
 
 
     def submit_edit(self, *args):
-        yyyymm    = self.yyyymm["text"]
-        day_new = self.edit_day_ent.get()
-        date_new  = yyyymm + day_new
+        day_new   = self.edit_day_ent.get()
+        date_new  = self.ym_str + day_new
         notes_new = self.edit_notes_ent.get()
         if day_new.isnumeric() == True:
             self.controller.edit_row(self.sel_id, date_new, notes_new)
-            self.edit_win.destroy()
-            self.refresh_ui()
+            self.destroy()
+            self.mainview.refresh_ui()
         else:
             messagebox.showerror(
                 title = 'Value is not valid!',
                 message = 'Please check your date input.')
             self.edit_day_ent.focus_force()
-        
+    
 
 if __name__ == "__main__":
     import app_controller

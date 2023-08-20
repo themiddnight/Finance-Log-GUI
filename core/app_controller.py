@@ -1,22 +1,22 @@
 try:
-    from app_view import UIView
+    from app_view import UIview
     from app_model import DataManage
 except ModuleNotFoundError:
-    from .app_view import UIView
+    from .app_view import UIview
     from .app_model import DataManage
 
 class Controller:
     def __init__(self):
         self.model = DataManage()
-        self.view  = UIView(self)
+        self.view  = UIview(self)
         self.months_name = {
             "01": "January", "02": "February", "03": "March",
             "04": "April", "05": "May", "06": "June",
             "07": "July", "08": "August", "09": "September",
             "10": "October", "11": "November", "12": "December"} 
         
-
-    def fmt_num_out(self, value) -> str:
+    def fmt_num_out(self, value: int|float) -> str:
+        '''Format int/float to string #,###'''
         if value is None:   
             output = ''
         else:               
@@ -24,11 +24,14 @@ class Controller:
         return output
     
 
-    def fmt_num_in(self, value) -> int|float:
+    def fmt_num_in(self, value: int|float) -> int|float:
+        '''Format float to 2 places decimal'''
         return round(value, 2)
     
 
-    def init_table(self):   
+    def init_table(self):
+        '''Set the latest table as current table. 
+        If no table, create current date as a new one.'''
         try:        # set latest table as init table
             table_list = self.model.get_table_list()
             self.model.table = table_list[-1]
@@ -37,11 +40,13 @@ class Controller:
 
 
     def get_app_geo(self) -> str:
+        '''Get the main window geometry from pref.json'''
         pref = self.model.load_pref()
         return pref["app_geometry"]
     
 
-    def save_screen_size(self, screen_size:str):
+    def save_screen_size(self, screen_size: str):
+        '''Save the main window geometry to pref.json'''
         self.model.save_pref("app_geometry", screen_size)
 
 
@@ -53,11 +58,13 @@ class Controller:
         return self.model.get_table_list()
     
 
-    def set_current_table(self, table:str):
+    def set_current_table(self, table: str):
         self.model.table = table
     
 
     def get_table_data(self) -> tuple:
+        '''Returns ([id, date, income, bank, cash, 
+        bank_dif, cash_dif, total_dif, notes])'''
         data_raw = self.model.get_table_data()
         data = []
         for i in data_raw:
@@ -77,6 +84,7 @@ class Controller:
     
 
     def get_table_sum(self) -> tuple:
+        '''Returns [income, bank_diff, cash_diff, total_diff]'''
         data_sum_raw = self.model.get_table_sum()
         try:
             data_sum = (
@@ -85,11 +93,13 @@ class Controller:
                 self.fmt_num_out(self.fmt_num_in(data_sum_raw[2])),
                 self.fmt_num_out(self.fmt_num_in(data_sum_raw[3])))
             return data_sum
-        except:
+        except: # if no data, return no data
             return data_sum_raw
     
 
     def get_rotate_table(self) -> tuple:
+        '''Returns ([day], [income], [bank], [cash], 
+        [bank_d], [cash_d], [sum_d], [notes]), [sum_remain]'''
         cols_data, sum_remain = self.model.get_rotate_table()
         date_ls   = [i.split('-')[-1] for i in cols_data[0]]
         income_ls = [0 if i is None else i for i in cols_data[1]]
@@ -103,8 +113,8 @@ class Controller:
                 bank_d_ls, cash_d_ls, sum_d_ls, notes_ls), sum_remain
     
 
-    def submit_data(self, date:str, income:int|float, bank:int|float, 
-                    cash:int|float, notes:str) -> bool:
+    def submit_data(self, date: str, income:int| float, bank:int| float, 
+                    cash: int| float, notes: str) -> bool:
         try:
             self.model.date = date
             if income == '':
@@ -115,7 +125,7 @@ class Controller:
             self.model.cash  = self.fmt_num_in(float(cash))
             self.model.notes = str(notes)
             month = self.months_name[date.split('-')[1]]
-            year = date.split('-')[0]
+            year  = date.split('-')[0]
             self.model.table = '{} {}'.format(month, year)
             # check if current table exists in db
             table_list = self.model.get_table_list()

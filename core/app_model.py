@@ -1,29 +1,33 @@
 import sqlite3
 import json
+import os
 from datetime import datetime
 
 class DataManage:
     def __init__(self):
-        self.pref_file : str = "core/data/pref.json"
-        self.db_file   : str = 'core/data/database.db'
-        self.win_geo   : str = "1003x600+350+300"
-        self.table  : str = datetime.now().strftime('%B %Y')
-        self.date   : str = ''
-        self.income : int|float = 0
-        self.bank   : int|float = 0
-        self.cash   : int|float = 0
-        self.notes  : str = ''
-        self.connection = sqlite3.connect(self.db_file)
+        data_dir = os.path.expanduser('~') + '/Documents/Finance Logging/'
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+            
+        self.pref_file = data_dir + 'pref.json'
+        self.db_file   = data_dir + 'database.db'
+        self.win_geo   = "1024x600+350+200"
+        self.table  = datetime.now().strftime('%B %Y')
+        self.date   = ''
+        self.income = 0
+        self.bank   = 0
+        self.cash   = 0
+        self.notes  = ''
         
 
-    def load_pref(self) -> dict:
+    def load_pref(self):
         try:
             with open(self.pref_file, 'r') as f:
                 pref = json.load(f)
             return pref
-        except FileNotFoundError:
+        except:
             with open(self.pref_file, 'w') as f:
-                json.dump({"app_geometry": self.win_geo}, f)
+                json.dump({"app_geometry": self.win_geo, "graph_theme" : self.graph_theme}, f)
             with open(self.pref_file, 'r') as f:
                 pref = json.load(f)
             return pref
@@ -53,7 +57,7 @@ class DataManage:
         connection.close()
 
 
-    def get_table_list(self) -> tuple|None:
+    def get_table_list(self) -> list | None:
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
         # get all tables
@@ -82,7 +86,9 @@ class DataManage:
         return sorted_table_list
 
 
-    def get_table_data(self):
+    def get_table_data(self) -> list | None:
+        '''Returns ([id, date, income, bank, cash, 
+        bank_dif, cash_dif, total_dif, notes])'''
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
         # get entire table
@@ -95,7 +101,8 @@ class DataManage:
         return data
 
 
-    def get_table_sum(self):
+    def get_table_sum(self) -> list | None:
+        '''Returns [income, bank_diff, cash_diff, total_diff]'''
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
         # get sum
@@ -108,7 +115,9 @@ class DataManage:
         return sum
 
 
-    def get_rotate_table(self):
+    def get_rotate_table(self) -> tuple[list, list]:
+        '''Returns ([date], [income], [bank], [cash], 
+        [bank_d], [cash_d], [sum_d], [notes]), [sum_remain]'''
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
         cursor.execute("""PRAGMA table_info("{}")""".format(self.table))
@@ -124,24 +133,17 @@ class DataManage:
         connection.close()
         sum_remain = [x + y for x, y in zip(column_datas[2], column_datas[3])]
         return column_datas, sum_remain
-        # day_list, income_list, bank_list, cash_list, bank_d_list, cash_d_list, sum_remain
 
 
     def insert_data(self):
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
-        # self.init(self.table)
         # read 2 latest row
         cursor.execute("""--sql
                     SELECT ID, bank, cash FROM '{}'
                     ORDER by ID DESC;
                     """.format(self.table))
-        rows = cursor.fetchmany(2)
-        # check latest id
-        if not rows:        # if empty, start with 0
-            id = 0         
-        else:               # if has data, increase id
-            id = rows[0][0] + 1   
+        rows = cursor.fetchmany(2) 
         # calculate difference
         if len(rows) >= 1:  # if it has a row prior to find difference
             if not self.income:
@@ -160,10 +162,10 @@ class DataManage:
             cash_dif = None
         # add item to table
         cursor.execute("""--sql
-                    INSERT INTO '{}' (ID, date, income, bank, cash, 
+                    INSERT INTO '{}' (date, income, bank, cash, 
                     bank_dif, cash_dif, total_dif, notes)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);""".format(self.table),
-                    (id, self.date, self.income, self.bank, self.cash,
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?);""".format(self.table),
+                    (self.date, self.income, self.bank, self.cash,
                     bank_dif, cash_dif, total_dif, self.notes))
         connection.commit()
         cursor.close()
@@ -205,7 +207,7 @@ class DataManage:
         connection.close()
 
 
-    def edit_row(self, id, date, notes):
+    def edit_row(self, id: int, date: str, notes: str):
         connection = sqlite3.connect(self.db_file)
         cursor = connection.cursor()
         cursor.execute("""--sql
