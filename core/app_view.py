@@ -7,8 +7,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 class UIview(Tk):
     def __init__(self, controller):
         super().__init__()
-        
         self.controller = controller
+        self.theme_list = self.controller.get_theme_list()
 
         self.title('Finance Logging')
         self.minsize(1024, 430)
@@ -22,7 +22,8 @@ class UIview(Tk):
         self.get_tabl_frm  = ttk.Frame(self)
         self.sel_tabl_l    = ttk.Label(self.get_tabl_frm, text = 'Select table:')
         self.sel_tabl_comb = ttk.Combobox(self.get_tabl_frm, state = 'readonly')
-        self.grphcolor_btn = ttk.Button(self.get_tabl_frm, text='🔆', width = 0)
+        self.theme_btn = ttk.Button(self.get_tabl_frm, text='☀︎', width = 0, 
+                                        command = self.toggle_theme)
         self.del_tabl_btn  = ttk.Button(self.get_tabl_frm, text = 'Delete This Table'
                                         ,command = self.delete_table)
         self.del_row_btn   = ttk.Button(self.get_tabl_frm, text = 'Delete Latest Row'
@@ -52,7 +53,6 @@ class UIview(Tk):
         # generate graph canvas
         self.figure       = Figure(figsize = (6, 2), facecolor = "#222222")
         self.graph_canvas = FigureCanvasTkAgg(self.figure, master = self.graph_frm)
-        self.graph_canvas.get_tk_widget().configure(background = "#222222")
 
         # input frame
         inp_w = 14
@@ -79,7 +79,7 @@ class UIview(Tk):
         self.get_tabl_frm.pack (fill = 'both', pady = (15, 0), padx = 20)
         self.sel_tabl_l.pack   (side = 'left')
         self.sel_tabl_comb.pack(side = 'left')
-        self.grphcolor_btn.pack(side = 'right', ipadx = 0)
+        self.theme_btn.pack(side = 'right', ipadx = 0)
         self.del_tabl_btn.pack (side = 'right', padx = 10)
         self.del_row_btn.pack  (side = 'right', ipadx = 10, padx = 0)
 
@@ -120,6 +120,9 @@ class UIview(Tk):
          # ---------- methods ----------
 
     def refresh_ui(self, *args):
+        self.theme_sel = self.controller.get_app_theme()
+        self.theme = self.theme_list[self.theme_sel]
+
         self.geometry(self.controller.get_app_geo())
         table_list = self.controller.get_table_list()
         self.sel_tabl_comb['values'] = table_list
@@ -131,7 +134,17 @@ class UIview(Tk):
 
 
     def save_screen_size(self, *args):
-        self.controller.save_screen_size(self.geometry())
+        self.controller.save_app_geo(self.geometry())
+
+    
+    def toggle_theme(self, *args):
+        if self.theme_sel == "bright":
+            self.theme_sel = "dark"
+            self.controller.save_app_theme("dark")
+        elif self.theme_sel == "dark":
+            self.theme_sel = "bright"
+            self.controller.save_app_theme("bright")
+        self.refresh_ui()
 
 
     def select_table(self, *args):
@@ -164,23 +177,25 @@ class UIview(Tk):
         # [day, income, bank, cash, bank_d, cash_d, sum_d, notes], sum_remain
         cols_data, sum_remain = self.controller.get_rotate_table()
         self.figure.clear()
+        self.graph_canvas.get_tk_widget().configure(background = self.theme["figure_bg"])
+        self.figure.set_facecolor(self.theme["figure_bg"])
         self.figure.subplots_adjust(left = 0.07, bottom = 0.08,
                                     right = 0.94, top = 0.94)
         
-        ax1 = self.figure.add_subplot(211, facecolor = '#131313')
+        ax1 = self.figure.add_subplot(211, facecolor = self.theme["figure_facecolor"])
         ax1.fill_between(cols_data[0], cols_data[6], 0, label = "Summary", 
                         color = 'tab:gray', alpha = 0.3)
         ax1.plot(cols_data[0], cols_data[4], label = "Bank", color = 'tab:blue')
         ax1.plot(cols_data[0], cols_data[5], label = "Cash", color = 'tab:orange')
-        ax1.grid(linestyle = '--', linewidth = 0.2)
-        ax1.tick_params(axis = "both", colors = "white", labelsize = 8)
+        ax1.grid(linewidth = 0.5, color = self.theme["grid"])
+        ax1.tick_params(axis = "both", colors = self.theme["tick"], labelsize = 8)
         for i in ax1.spines:
-            ax1.spines[i].set_color('#222222')
-        ax1.set_ylabel('Spending', color = 'white', labelpad = 14)
+            ax1.spines[i].set_color(self.theme["spines"])
+        ax1.set_ylabel('Spending', color = self.theme["ylabel"], labelpad = 14)
         ax1.yaxis.set_label_position("right")
         ax1.yaxis.label.set_size(9)
-        ax1.legend(fontsize = 9, labelcolor = 'white', 
-                  facecolor = "#333333", edgecolor = "#444444")
+        ax1.legend(fontsize = 9, labelcolor = self.theme["legend"]["labelcolor"], 
+                  facecolor = self.theme["legend"]["facecolor"], edgecolor = self.theme["legend"]["edgecolor"])
         try:
             max_spnd = min(cols_data[6])
             ax1.set_ylim(top = 0, bottom = max_spnd + (max_spnd*0.05))
@@ -188,23 +203,23 @@ class UIview(Tk):
             pass
         ax1.invert_yaxis()
 
-        ax2 = self.figure.add_subplot(212, facecolor = '#131313')
+        ax2 = self.figure.add_subplot(212, facecolor = self.theme["figure_facecolor"])
         ax2.bar(cols_data[0], cols_data[1], label = "Income", 
                alpha = 0.3, color = 'tab:cyan')
         ax2.plot(cols_data[0], sum_remain, label = "Remaining", color = 'tab:purple')
-        ax2.grid(linestyle = '--', linewidth = 0.2)
-        ax2.tick_params(axis = "both", colors = "white", labelsize = 8)
+        ax2.grid(linewidth = 0.5, color = self.theme["grid"])
+        ax2.tick_params(axis = "both", colors = self.theme["tick"], labelsize = 8)
         for i in ax2.spines:
-            ax2.spines[i].set_color('#222222')
-        ax2.set_ylabel('Income\n& Remaining', color = 'white', labelpad = 9)
+            ax2.spines[i].set_color(self.theme["spines"])
+        ax2.set_ylabel('Income\n& Remaining', color = self.theme["ylabel"], labelpad = 9)
         ax2.yaxis.set_label_position("right")
         ax2.yaxis.label.set_size(9)
-        ax2.legend(fontsize = 9, labelcolor = 'white', 
-                  facecolor = "#333333", edgecolor = "#444444")
+        ax2.legend(fontsize = 9, labelcolor = self.theme["legend"]["labelcolor"], 
+                  facecolor = self.theme["legend"]["facecolor"], edgecolor = self.theme["legend"]["edgecolor"])
         for i in range(len(cols_data[0])):
             ax2.annotate(cols_data[7][i], xy = (i, 0), xytext = (-5,10)
                         ,textcoords = 'offset points', rotation = 60
-                        ,fontsize = 10, fontname = 'Tahoma', color = '#cccccc')
+                        ,fontsize = 10, fontname = 'Tahoma', color = self.theme["legend"]["labelcolor"])
             
         self.graph_canvas.draw()
 

@@ -38,16 +38,30 @@ class Controller:
         except:     # if no table list, pass it and use default
             self.model.new_table()
 
+    def get_theme_list(self):
+        return self.model.theme_list
+
 
     def get_app_geo(self) -> str:
         '''Get the main window geometry from pref.json'''
-        pref = self.model.load_pref()
-        return pref["app_geometry"]
+        self.model.load_pref()
+        return self.model.pref["app_geometry"]
     
 
-    def save_screen_size(self, screen_size: str):
+    def save_app_geo(self, screen_size: str):
         '''Save the main window geometry to pref.json'''
-        self.model.save_pref("app_geometry", screen_size)
+        self.model.pref["app_geometry"] = screen_size
+        self.model.save_pref()
+
+
+    def get_app_theme(self):
+        self.model.load_pref()
+        return self.model.pref["app_theme"]
+    
+
+    def save_app_theme(self, theme: str):
+        self.model.pref["app_theme"] = theme
+        self.model.save_pref()
 
 
     def get_current_table(self) -> str:

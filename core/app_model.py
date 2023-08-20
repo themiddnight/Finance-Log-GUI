@@ -5,37 +5,39 @@ from datetime import datetime
 
 class DataManage:
     def __init__(self):
+        with open('core/themes.json', 'r') as f:
+            self.theme_list = json.load(f)
+
         data_dir = os.path.expanduser('~') + '/Documents/Finance Logging/'
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
             
-        self.pref_file = data_dir + 'pref.json'
+        self.pref_path = data_dir + 'pref.json'
         self.db_file   = data_dir + 'database.db'
-        self.win_geo   = "1024x600+350+200"
         self.table  = datetime.now().strftime('%B %Y')
         self.date   = ''
         self.income = 0
         self.bank   = 0
         self.cash   = 0
         self.notes  = ''
+        self.pref = {"app_geometry":"1024x600+350+200", 
+                     "app_theme":"bright"}
         
 
     def load_pref(self):
         try:
-            with open(self.pref_file, 'r') as f:
-                pref = json.load(f)
-            return pref
+            with open(self.pref_path, 'r') as f:
+                self.pref = json.load(f)
         except:
-            with open(self.pref_file, 'w') as f:
-                json.dump({"app_geometry": self.win_geo, "graph_theme" : self.graph_theme}, f)
-            with open(self.pref_file, 'r') as f:
-                pref = json.load(f)
-            return pref
+            with open(self.pref_path, 'w') as f:
+                json.dump(self.pref, f)
+            with open(self.pref_path, 'r') as f:
+                self.pref = json.load(f)
     
     
-    def save_pref(self, data: str, value: str):
-        with open(self.pref_file, 'w') as f:
-            json.dump({data: value}, f)
+    def save_pref(self):
+        with open(self.pref_path, 'w') as f:
+            json.dump(self.pref, f)
 
 
     def set_table_name(self):
