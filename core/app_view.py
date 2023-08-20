@@ -296,6 +296,7 @@ class UIedit(Toplevel):
         main_cen_y = round(main_y + (main_h / 2))
 
         # generate ui
+        self.focus_force()
         self.title   (f'Edit: {date}')
         self.geometry('550x100+{}+{}'.format(main_cen_x - 275, main_cen_y - 50))
         self.minsize (550, 100)
