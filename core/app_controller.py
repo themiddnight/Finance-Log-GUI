@@ -72,7 +72,7 @@ class Controller:
         table_list_raw = self.model.get_table_list()
         if table_list_raw:
             table_list_raw.remove(('sqlite_sequence',))
-            table_list = [i[0] for i in table_list_raw]
+            table_list = list(map(lambda x: x[0], table_list_raw))
             def get_month_year(date_str):   # sorting table name
                 months = {'January': 1, 'February': 2, 'March': 3, 
                         'April': 4, 'May': 5, 'June': 6, 'July': 7, 
@@ -131,6 +131,7 @@ class Controller:
         '''Returns ([day], [income], [bank], [cash], 
         [bank_d], [cash_d], [sum_d], [notes]), [sum_remain]'''
         cols_data, sum_remain = self.model.get_rotate_table()
+        # replace "None" to 0 or ''
         date_ls   = list(map(lambda x: x.split('-')[-1],cols_data[0]))
         income_ls = list(map(lambda x: 0 if x is None else x,cols_data[1]))
         bank_ls   = cols_data[2]
