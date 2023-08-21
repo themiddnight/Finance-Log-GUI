@@ -1,6 +1,6 @@
 {
     "dark":{
-        "figure_bg":"#222222", "figure_facecolor":"#131313", 
+        "figure_bg":"#222222", "figure_facecolor":"#161616", 
         "spines":"#222222", "grid":"#333333", "tick":"white", "ylabel":"white", 
         "legend":{
             "labelcolor":"white", "facecolor":"#333333", 

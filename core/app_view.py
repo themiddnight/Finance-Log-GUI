@@ -11,7 +11,7 @@ class UIview(Tk):
         self.theme_list = self.controller.get_theme_list()
 
         self.title('Finance Logging')
-        self.minsize(1124, 430)
+        self.minsize(810, 500)
         icon = PhotoImage(file = "core/image/icon.png")
         self.iconphoto(False, icon)
 
@@ -52,27 +52,28 @@ class UIview(Tk):
 
         # generate graph canvas
         self.figure       = Figure(figsize = (6, 2), facecolor = "#222222")
-        self.graph_canvas = FigureCanvasTkAgg(self.figure, 
-                                              master = self.graph_frm)
+        self.graph_canvas = FigureCanvasTkAgg(self.figure
+                                             ,master = self.graph_frm)
 
         # input frame
         inp_w = 18
-        self.input_frm   = ttk.Labelframe(self, text = 'Insert Data:')
-        self.date_l      = ttk.Label(self.input_frm, text = 'Date: *')
-        self.date_ent    = DateEntry(self.input_frm
-                                     ,date_pattern = 'yyyy-MM-dd'
+        self.input_frm    = ttk.Labelframe(self, text = 'Insert Data:')
+        self.date_l       = ttk.Label(self.input_frm, text = 'Date: *')
+        self.date_ent     = DateEntry(self.input_frm,date_pattern = 'yyyy-MM-dd'
                                      ,firstweekday = 'sunday'
                                      ,showweeknumbers = False
                                      ,showothermonthdays = False)
-        self.income_l    = ttk.Label(self.input_frm, text = 'Income:')
-        self.income_ent  = ttk.Entry(self.input_frm, width = inp_w)
-        self.banl_l      = ttk.Label(self.input_frm, text = 'Bank Remaining: *')
-        self.bank_ent    = ttk.Entry(self.input_frm, width = inp_w)
-        self.cash_l      = ttk.Label(self.input_frm, text = 'Cash Remaining: *')
-        self.cash_ent    = ttk.Entry(self.input_frm, width = inp_w)
-        self.notes_l     = ttk.Label(self.input_frm, text = 'Notes:')
-        self.notes_ent   = ttk.Entry(self.input_frm, width = 24)
-        self.submit_btn  = ttk.Button(self.input_frm, text = 'Submit'
+        self.banl_l       = ttk.Label(self.input_frm, text = 'Bank Remaining: *')
+        self.bank_ent     = ttk.Entry(self.input_frm, width = inp_w)
+        self.cash_l       = ttk.Label(self.input_frm, text = 'Cash Remaining: *')
+        self.cash_ent     = ttk.Entry(self.input_frm, width = inp_w)
+        self.notes_l      = ttk.Label(self.input_frm, text = 'Notes:')
+        self.notes_ent    = ttk.Entry(self.input_frm, width = 24)
+        self.income_l     = ttk.Label(self.input_frm, text = 'Income:')
+        self.income_ent   = ttk.Entry(self.input_frm, width = inp_w)
+        self.withdraw_l   = ttk.Label(self.input_frm, text = 'Withdraw:')
+        self.withdraw_ent = ttk.Entry(self.input_frm, width = inp_w)
+        self.submit_btn   = ttk.Button(self.input_frm, text = 'Submit'
                                       ,width = 7, command = self.submit_data)
 
 
@@ -94,27 +95,31 @@ class UIview(Tk):
 
         self.graph_canvas.get_tk_widget().pack(expand = 1, fill = 'both')
 
-        self.input_frm.pack (padx = 20, pady = (0, 20), ipadx = 5, ipady = 3)
-        self.date_l.grid    (sticky='w', row=0, column=0, padx=5, pady=(5,0))
-        self.date_ent.grid  (row = 1, column = 0, padx = 5)
-        self.income_l.grid  (sticky='w', row=0, column=1, padx=5, pady=(5,0))
-        self.income_ent.grid(row = 1, column = 1, padx = 5)
-        self.banl_l.grid    (sticky='w', row=0, column=2, padx=5, pady=(5,0))
-        self.bank_ent.grid  (row = 1, column = 2, padx = 5)
-        self.cash_l.grid    (sticky='w', row=0, column=3, padx=5, pady=(5,0))
-        self.cash_ent.grid  (row = 1, column = 3, padx = 5)
-        self.notes_l.grid   (sticky='w', row=0, column=4, padx=5, pady=(5,0))
-        self.notes_ent.grid (row = 1, column = 4, padx = 5)
-        self.submit_btn.grid(row = 1, column = 5, padx = 5, ipadx = 10)
+        self.input_frm.pack (padx = 20, pady = (0, 30), ipadx = 5, ipady = 3)
+        self.date_l.grid    (sticky='w', row=0, column=0, padx=10, pady=(3,0))
+        self.date_ent.grid              (row=1, column=0, padx=10)
+        self.banl_l.grid    (sticky='w', row=0, column=1, padx=10, pady=(3,0))
+        self.bank_ent.grid              (row=1, column=1, padx=10)
+        self.cash_l.grid    (sticky='w', row=0, column=2, padx=10, pady=(3,0))
+        self.cash_ent.grid              (row=1, column=2, padx=10)
+        self.notes_l.grid   (sticky='w', row=0, column=3, padx=10, pady=(3,0))
+        self.notes_ent.grid             (row=1, column=3, padx=10)
+
+        self.income_l.grid  (sticky='w', row=2, column=1, padx=10, pady=(3,0))
+        self.income_ent.grid            (row=3, column=1, padx=10)
+        self.withdraw_l.grid(sticky='w', row=2, column=2, padx=10, pady=(3,0))
+        self.withdraw_ent.grid          (row=3, column=2, padx=10)
+        self.submit_btn.grid(sticky='news', row=3, column=3, padx=10, ipadx = 5)
 
 
-        # ---------- validate / get events ----------
+        # ---------- bindings ----------
 
         self.bind('<Configure>', self.save_screen_size)
-        self.income_ent.bind('<Return>', self.submit_data)
         self.bank_ent.bind('<Return>', self.submit_data)
         self.cash_ent.bind('<Return>', self.submit_data)
         self.notes_ent.bind('<Return>', self.submit_data)
+        self.income_ent.bind('<Return>', self.submit_data)
+        self.withdraw_ent.bind('<Return>', self.submit_data)
         self.sel_tabl_comb.bind("<<ComboboxSelected>>", self.select_table)
         self.finance_tabl.bind("<Double-1>", self.edit_table_win)
 
@@ -163,17 +168,20 @@ class UIview(Tk):
 
 
     def submit_data(self, *args):
-        date   = self.date_ent.get_date().strftime("%Y-%m-%d")
-        income = self.income_ent.get()
-        bank   = self.bank_ent.get()
-        cash   = self.cash_ent.get()
-        notes  = self.notes_ent.get()
-        check  = self.controller.submit_data(date, income, bank, cash, notes)
-        focused = self.focus_get()
+        date     = self.date_ent.get_date().strftime("%Y-%m-%d")
+        income   = self.income_ent.get()
+        bank     = self.bank_ent.get()
+        cash     = self.cash_ent.get()
+        withdraw = self.withdraw_ent.get()
+        notes    = self.notes_ent.get()
+        check    = self.controller.submit_data(date, income, bank, cash, 
+                                               withdraw, notes)
+        focused  = self.focus_get()
         if check:
             self.income_ent.delete(0, 'end')
             self.bank_ent.delete(0, 'end')
             self.cash_ent.delete(0, 'end')
+            self.withdraw_ent.delete(0, 'end')
             self.notes_ent.delete(0, 'end')
             self.refresh_ui()
         else:
@@ -247,43 +255,44 @@ class GraphGenerate:
         self.mainview.graph_canvas.get_tk_widget().configure(
             background = self.mainview.theme_color["figure_bg"])
         self.mainview.figure.set_facecolor(self.mainview.theme_color["figure_bg"])
-        self.mainview.figure.subplots_adjust(left = 0.07, bottom = 0.0
+        self.mainview.figure.subplots_adjust(left = 0.07, bottom = 0.08
                                     ,right = 0.94, top = 0.94)
         
         ax1 = self.mainview.figure.add_subplot(
             211, facecolor = self.mainview.theme_color["figure_facecolor"])
+        ax1.margins(x = 0.02)
         ax1.fill_between(cols_data[0], cols_data[6], 0, label = "Summary"
                          ,color = 'tab:gray', alpha = 0.2)
         ax1.plot(cols_data[0], cols_data[4], label = "Bank", color = 'tab:blue')
         ax1.plot(cols_data[0], cols_data[5], label = "Cash", color = 'tab:orange')
         ax1.grid(linewidth = 0.5, color = self.mainview.theme_color["grid"])
-        ax1.tick_params(axis = "both", colors = self.mainview.theme_color["tick"], labelsize = 8)
+        ax1.tick_params(axis = "both", 
+                        colors = self.mainview.theme_color["tick"], labelsize = 8)
         for i in ax1.spines:
             ax1.spines[i].set_color(self.mainview.theme_color["spines"])
-        ax1.set_ylabel('Spending', color = self.mainview.theme_color["ylabel"], labelpad = 14)
+        ax1.set_ylabel('Spending', 
+                       color = self.mainview.theme_color["ylabel"], labelpad = 14)
         ax1.yaxis.set_label_position("right")
         ax1.yaxis.label.set_size(9)
         ax1.legend(fontsize = 9, draggable = True
                    ,labelcolor = self.mainview.theme_color["legend"]["labelcolor"]
                    ,facecolor = self.mainview.theme_color["legend"]["facecolor"]
                    ,edgecolor = self.mainview.theme_color["legend"]["edgecolor"])
-        try:
-            max_spnd = min(cols_data[6])
-            ax1.set_ylim(top = 0 - (max_spnd*0.05), bottom = max_spnd + (max_spnd*0.05))
-        except:
-            pass
         ax1.invert_yaxis()
 
         ax2 = self.mainview.figure.add_subplot(
-            212, facecolor = self.mainview.theme_color["figure_facecolor"])
+            212, sharex = ax1, facecolor = self.mainview.theme_color["figure_facecolor"])
+        ax2.margins(x = 0.02)
         ax2.bar(cols_data[0], cols_data[1], label = "Income"
                ,alpha = 0.3, color = 'tab:cyan')
         ax2.plot(cols_data[0], sum_remain, label = "Remaining", color = 'tab:purple')
         ax2.grid(linewidth = 0.5, color = self.mainview.theme_color["grid"])
-        ax2.tick_params(axis = "both", colors = self.mainview.theme_color["tick"], labelsize = 8)
+        ax2.tick_params(axis = "both", 
+                        colors = self.mainview.theme_color["tick"], labelsize = 8)
         for i in ax2.spines:
             ax2.spines[i].set_color(self.mainview.theme_color["spines"])
-        ax2.set_ylabel('Income\n& Remaining', color = self.mainview.theme_color["ylabel"], labelpad = 9)
+        ax2.set_ylabel('Income\n& Remaining', 
+                       color = self.mainview.theme_color["ylabel"], labelpad = 9)
         ax2.yaxis.set_label_position("right")
         ax2.yaxis.label.set_size(9)
         ax2.legend(fontsize = 9, draggable = True
@@ -292,8 +301,8 @@ class GraphGenerate:
                    ,edgecolor = self.mainview.theme_color["legend"]["edgecolor"])
         for i in range(len(cols_data[0])):
             ax2.annotate(cols_data[7][i], xy = (i, 0), xytext = (-5,10)
-                        ,textcoords = 'offset points', rotation = 60
-                        ,fontsize = 10, fontname = 'Tahoma'
+                        ,textcoords = 'offset points', rotation = 70
+                        ,fontsize = 9, fontname = 'Tahoma'
                         ,color = self.mainview.theme_color["legend"]["labelcolor"])
             
         self.mainview.graph_canvas.draw()
@@ -333,11 +342,11 @@ class UIedit(Toplevel):
         self.date_frm       = ttk.Frame(self.edit_frm)
         self.yyyymm_l       = ttk.Label(self.date_frm, text = self.ym_str)
         self.edit_day_ent   = ttk.Spinbox(self.date_frm, width = 3
-                                          ,from_ = 1, to = 31, wrap = True)
+                                         ,from_ = 1, to = 31, wrap = True)
         self.edit_notes_l   = ttk.Label(self.edit_frm, text = 'Notes: ')
         self.edit_notes_ent = ttk.Entry(self.edit_frm, width = 40)
         submit_btn          = ttk.Button(self, text = 'Submit'
-                                         ,command = self.submit_edit)
+                                        ,command = self.submit_edit)
 
         self.edit_day_ent.insert(0, day)
         self.edit_notes_ent.insert(0, notes[2:])

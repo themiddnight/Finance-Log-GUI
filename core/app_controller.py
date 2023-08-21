@@ -144,12 +144,11 @@ class Controller:
                 bank_d_ls, cash_d_ls, sum_d_ls, notes_ls), sum_remain
     
 
-    def submit_data(self, date, income, bank, cash, notes) -> bool:
+    def submit_data(self, date, income, bank, cash, withdraw, notes) -> bool:
         try:
             self.model.date  = date
             self.model.bank  = self.fmt_num_in(float(bank))
             self.model.cash  = self.fmt_num_in(float(cash))
-            self.model.notes = str(notes)
             month = self.months_name[date.split('-')[1]]
             year  = date.split('-')[0]
             self.model.table = '{} {}'.format(month, year)
@@ -159,20 +158,30 @@ class Controller:
             if self.model.table not in table_list:
                 self.model.new_table()
 
-            # if it has prior data to find difference
+            # if it has prior data for calculate spending
             if self.model.get_table_data():  
                 data = self.model.get_table_data()[-1]
                 bank_prior = float(data[3])
                 cash_prior = float(data[4])
                 # calculate difference
-                if income == '':
-                    self.model.income = None
-                    bank_dif = round((float(bank) - bank_prior), 2)
-                else:
+                # if income, income - bank remain to correct bank spending
+                if income != '':
                     self.model.income = self.fmt_num_in(float(income))
                     bank_dif = round(((float(bank) - bank_prior) - float(income)), 2)
+                else:
+                    self.model.income = None
+                    bank_dif = round((float(bank) - bank_prior), 2)
                 cash_dif  = round((float(cash) - cash_prior), 2)
                 total_dif = round((bank_dif + cash_dif), 2)
+                # if withdraw, calculate to correct bank and cash spending
+                if withdraw != '':
+                    bank_dif = bank_dif + float(withdraw)
+                    cash_dif = cash_dif - float(withdraw)
+                    # automatic add withdraw amount to notes
+                    if notes != '':
+                        notes = f'(Withdraw {self.fmt_num_out(int(withdraw))}) '+notes
+                    else:
+                        notes = f'(Withdraw {self.fmt_num_out(int(withdraw))})'
                 self.model.bank_dif  = self.fmt_num_in(float(bank_dif))
                 self.model.cash_dif  = self.fmt_num_in(float(cash_dif))
                 self.model.total_dif = self.fmt_num_in(float(total_dif))
@@ -184,6 +193,8 @@ class Controller:
                     bank_dif = round((bank - income), 2)
                     self.model.total_dif = bank_dif
                 self.model.cash_dif = None
+
+            self.model.notes = str(notes)
 
             self.model.insert_data()
             return True
