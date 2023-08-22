@@ -29,7 +29,7 @@ class Controller:
         return round(value, 2)
     
 
-    def init_table(self):
+    def initialize_table(self):
         '''Set the latest table as current table. 
         If no table, create current date as a new one.'''
         try:        # set latest table as init table
@@ -208,7 +208,7 @@ class Controller:
 
     def delete_table(self):
         self.model.delete_table()
-        self.init_table()
+        self.initialize_table()
 
 
     def edit_row(self, id, date_new, notes_new):
@@ -220,7 +220,7 @@ class Controller:
 
 
     def run(self):
-        self.init_table()
+        self.initialize_table()
         self.view.refresh_ui()
         self.view.mainloop()
 
