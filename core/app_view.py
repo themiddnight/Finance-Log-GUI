@@ -11,7 +11,6 @@ class UIview(Tk):
         self.theme_list = self.controller.get_theme_list()
 
         self.title('Finance Logging')
-        self.geometry(self.controller.get_app_geo())
         self.minsize(810, 500)
         icon = PhotoImage(file = "image/icon.png")
         self.iconphoto(False, icon)
@@ -133,6 +132,7 @@ class UIview(Tk):
     def refresh_ui(self, *args):
         self.theme_sel = self.controller.get_app_theme()
         self.theme_color = self.theme_list[self.theme_sel]
+        self.geometry(self.controller.get_app_geo())
         table_list = self.controller.get_table_list()
         self.sel_tabl_comb['values'] = table_list
         table = self.controller.get_current_table()
