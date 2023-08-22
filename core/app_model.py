@@ -9,7 +9,7 @@ class DataManage:
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
 
-        with open('core/themes.json', 'r') as f:
+        with open('data/themes.json', 'r') as f:
             self.theme_list = json.load(f)
             
         self.pref_path = data_dir + 'pref.json'
