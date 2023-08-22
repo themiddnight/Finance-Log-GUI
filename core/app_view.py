@@ -294,12 +294,11 @@ class GraphGenerate:
 
         ax2 = self.figure.add_subplot(
             212, sharex = ax1, facecolor = self.theme_color["figure_facecolor"])
-        ax2.margins(x = 0.02)
-        ax2.bar(self.cols_data[0], self.cols_data[1], label = "Income"
-                ,alpha = 0.3, color = 'tab:cyan')
-        ax2.plot(self.cols_data[0], self.sum_remain 
-                ,label = "Remaining", color = 'tab:purple')
-        ax2.grid(linewidth = 0.5, color = self.theme_color["grid"])
+        ax2.fill_between(self.cols_data[0], self.sum_remain,0 
+                ,label = "Remaining", color = 'tab:purple', alpha=0.2)
+        ax2.bar(self.cols_data[0], self.cols_data[1], zorder=3, label = "Income"
+                ,alpha = 0.5, color = 'tab:cyan')
+        ax2.grid(linewidth = 0.5, zorder = 0, color = self.theme_color["grid"])
         ax2.tick_params(axis = "both" 
                         ,colors = self.theme_color["tick"], labelsize = 8)
         for i in ax2.spines:
