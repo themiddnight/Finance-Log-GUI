@@ -99,9 +99,9 @@ class UIview(Tk):
         self.input_frm.pack   (padx = 20, pady = (0, 30), ipadx = 5, ipady = 5)
         self.date_l.grid      (row=0, column=0, padx=10, sticky='w', pady=(5,0))
         self.date_ent.grid    (row=1, column=0, padx=10)
-        self.banl_l.grid      (row=0, column=1, padx=10, sticky='w')
+        self.banl_l.grid      (row=0, column=1, padx=10, sticky='w', pady=(5,0))
         self.bank_ent.grid    (row=1, column=1, padx=10)
-        self.cash_l.grid      (row=0, column=2, padx=10, sticky='w')
+        self.cash_l.grid      (row=0, column=2, padx=10, sticky='w', pady=(5,0))
         self.cash_ent.grid    (row=1, column=2, padx=10)
 
         self.income_l.grid    (row=2, column=0, padx=10, sticky='w')
@@ -111,8 +111,8 @@ class UIview(Tk):
         self.notes_l.grid     (row=2, column=2, padx=10, sticky='w')
         self.notes_ent.grid   (row=3, column=2, padx=10)
 
-        self.submit_btn.grid  (row=1, column=3, padx=10, sticky='s'
-                               ,ipadx=20, rowspan=2)
+        self.submit_btn.grid  (row=0, column=3, padx=10, sticky='ns',pady = (10,0)
+                               ,ipadx=20, rowspan=4)
 
 
         # ---------- bindings ----------
