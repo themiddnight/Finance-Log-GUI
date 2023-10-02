@@ -1,8 +1,8 @@
-__pycache__
 playground
 .gitignore
 .DS_Store
 notes.txt
+*.command
 
 # ---> Python
 # Byte-compiled / optimized / DLL files

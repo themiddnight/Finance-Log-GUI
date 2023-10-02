@@ -326,8 +326,8 @@ class UIedit(Toplevel):
         self.mainview   = mainview
         self.controller = controller
         
-        self.sel_id = self.mainview.finance_tabl.focus()
-        sel         = self.mainview.finance_tabl.item(self.sel_id)
+        self.sel_id = self.mainview.fin_tabl.focus()
+        sel         = self.mainview.fin_tabl.item(self.sel_id)
         date, _, _, _, _, _, _, notes = sel.get("values")
         ymd_list    = date.split('-')
         day         = ymd_list.pop(2)
