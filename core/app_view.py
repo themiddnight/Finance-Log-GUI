@@ -42,13 +42,13 @@ class UIview(Tk):
         col_w_list  = (0, 70, gen_tabl_w, gen_tabl_w, gen_tabl_w, 
                         gen_tabl_w, gen_tabl_w, gen_tabl_w, 200)
         col_al_list = ('w', 'w', 'e', 'e', 'e', 'e', 'e', 'e', 'w')
-        self.scrl_table   = ttk.Scrollbar(self.table_frm)
-        self.finance_tabl = ttk.Treeview(self.table_frm, columns = col_list[1:]
-                                        ,yscrollcommand = self.scrl_table.set)
+        self.fin_tabl = ttk.Treeview(self.table_frm, columns = col_list[1:])
+        self.scrly_fin_table   = ttk.Scrollbar(self.table_frm, command=self.fin_tabl.yview)
+        self.fin_tabl.configure(yscrollcommand = self.scrly_fin_table.set)
         for i in range(len(col_list)):
-            self.finance_tabl.column(f'#{i}', width = col_w_list[i]
+            self.fin_tabl.column(f'#{i}', width = col_w_list[i]
                                      ,anchor = col_al_list[i])
-            self.finance_tabl.heading(f'#{i}', text = col_list[i])
+            self.fin_tabl.heading(f'#{i}', text = col_list[i])
 
         # generate graph canvas
         self.figure       = Figure(figsize = (6, 2), facecolor = "#222222")
@@ -91,8 +91,8 @@ class UIview(Tk):
         self.tab_view.add(self.graph_frm, text = f'{"Graph": ^20}')
         self.tab_view.pack(fill = 'both', expand = 1, pady = 5)
 
-        self.scrl_table.pack  (side = 'right', fill = 'y')
-        self.finance_tabl.pack(fill = 'both', expand = 1)
+        self.scrly_fin_table.pack  (side = 'right', fill = 'y')
+        self.fin_tabl.pack(fill = 'both', expand = 1)
 
         self.graph_canvas.get_tk_widget().pack(expand = 1, fill = 'both')
 
@@ -124,7 +124,7 @@ class UIview(Tk):
         self.income_ent.bind('<Return>', self.submit_data)
         self.withdraw_ent.bind('<Return>', self.submit_data)
         self.sel_tabl_comb.bind("<<ComboboxSelected>>", self.select_table)
-        self.finance_tabl.bind("<Double-1>", self.edit_table_win)
+        self.fin_tabl.bind("<Double-1>", self.edit_table_win)
 
 
          # ---------- methods ----------
@@ -142,7 +142,7 @@ class UIview(Tk):
 
 
     def generate_table_graph(self):
-            table = self.finance_tabl
+            table = self.fin_tabl
             data = self.controller.get_table_data()
             data_sum = self.controller.get_table_sum()
             table = TableGenerate(table, data, data_sum)
@@ -220,7 +220,7 @@ class UIview(Tk):
 
 
     def edit_table_win(self, *args):
-        if self.finance_tabl.focus().isnumeric() == True: # check by row's id
+        if self.fin_tabl.focus().isnumeric() == True: # check by row's id
             edit_window = UIedit(self, self.controller)
             edit_window.transient(self)
             edit_window.grab_set()
@@ -326,8 +326,8 @@ class UIedit(Toplevel):
         self.mainview   = mainview
         self.controller = controller
         
-        self.sel_id = self.mainview.finance_tabl.focus()
-        sel         = self.mainview.finance_tabl.item(self.sel_id)
+        self.sel_id = self.mainview.fin_tabl.focus()
+        sel         = self.mainview.fin_tabl.item(self.sel_id)
         date, _, _, _, _, _, _, notes = sel.get("values")
         ymd_list    = date.split('-')
         day         = ymd_list.pop(2)
